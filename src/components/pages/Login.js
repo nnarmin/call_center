@@ -1,38 +1,55 @@
-import React, {useState} from 'react';
-import {Button} from "react-bootstrap";
+import React, {useState, useRef, useContext} from 'react';
+import {Button, Spinner} from "react-bootstrap";
+import {LoginRequest} from "../api/Request";
+import AuthContext from "../store/auth-context";
 
 const Login = () => {
-    const [username, setUserName] = useState('');
-    const [password, setPassword] = useState('');
+    const [isFetching, setIsFetching] = useState(false);
+    const passwordInputRef = useRef();
+    const usernameInputRef = useRef();
+
+    const authCtx = useContext(AuthContext);
 
     const handleForm = (event) => {
         event.preventDefault();
-        console.log("submit");
-    };
+        setIsFetching(true);
+        const enteredName = usernameInputRef.current.value;
+        const enteredPassword = passwordInputRef.current.value;
+        if (enteredPassword.trim().length && enteredName.trim().length) {
+            LoginRequest(enteredName, enteredPassword).then(data => {
+                data && data.data && authCtx.login(data.data.idToken);
+                setIsFetching(false);
+            });
+        } else if (!enteredPassword.trim().length) {
 
-    const onChangeUserName = (event) => {
-        setUserName(event.target.value)
-    };
-
-    const onChangePassword = (event) => {
-        setPassword(event.target.value)
+        }
     };
 
     return (
         <div className="container">
             <div className="row">
                 <div className="col-lg-6 ml-auto mr-auto mt-5">
-                    <form onSubmit={handleForm}>
-                        <div className="form-group">
-                            <label htmlFor="fname">User Name:</label>
-                            <input type="text" id="username" name="username" onChange={onChangeUserName} value={username}/>
+                    <div className="card">
+                        <div className="card-body">
+                            <form onSubmit={handleForm}>
+                                <div className="form-group">
+                                    <label htmlFor="fname">İstifadəçi adı:</label>
+                                    <input type="text" id="username" name="username" className="form-control"
+                                           ref={usernameInputRef}/>
+                                </div>
+                                <div className="form-group">
+                                    <label htmlFor="lname">Şifrə:</label>
+                                    <input type="password" id="password" name="password" className="form-control"
+                                           ref={passwordInputRef}/>
+                                </div>
+                                <Button type="submit" variant="primary">
+                                    Daxil Ol
+                                    {isFetching
+                                    && <Spinner style={{ marginLeft: 10 }} animation='border' variant='light' size='sm' className='align-middle' />}
+                                </Button>
+                            </form>
                         </div>
-                        <div className="form-group">
-                            <label htmlFor="lname">Password:</label>
-                            <input type="password" id="password" name="password" onChange={onChangePassword} value={password}/>
-                        </div>
-                        <Button type="submit" variant="primary">Submit</Button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,10 +3,13 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {AuthContextProvider} from "./components/store/auth-context";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
+    <AuthContextProvider>
+        <React.StrictMode>
+            <App/>
+        </React.StrictMode>
+    </AuthContextProvider>,
+    document.getElementById('root')
 );

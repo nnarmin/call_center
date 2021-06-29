@@ -1,15 +1,20 @@
 import axios from 'axios';
 
 const instance = axios.create({
-    baseURL: 'https://some-domain.com/api/',
+    baseURL: 'http://192.168.3.171:8081/api/v1',
     timeout: 1000,
-    headers: {'X-Custom-Header': 'foobar'}
 });
 
-const makeRequest = (type, path, body) => instance.type(path, body)
+export const makeRequest = (type, path, body) => instance[type](path, body)
     .then(function (response) {
-        console.log(response);
+        return response;
     })
     .catch(function (error) {
         console.log(error);
     });
+
+instance.interceptors.response.use(function (response) {
+    return response;
+}, function (error) {
+    return Promise.reject(error);
+});
