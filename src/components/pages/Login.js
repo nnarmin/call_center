@@ -1,4 +1,6 @@
 import React, {useState, useRef, useContext} from 'react';
+import jwt_decode from 'jwt-decode';
+
 import {Button, Spinner} from "react-bootstrap";
 import {LoginRequest} from "../api/Request";
 import AuthContext from "../store/auth-context";
@@ -17,7 +19,11 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
         if (enteredPassword.trim().length && enteredName.trim().length) {
             LoginRequest(enteredName, enteredPassword).then(data => {
-                data && data.data && authCtx.login(data.data.idToken);
+                const decoded_jwt= data && data.data && jwt_decode(data.data.idToken);
+                const expirationTime = new Date(
+                    new Date().getTime() + +decoded_jwt.exp * 1000
+                );
+                data && data.data && authCtx.login(data.data.idToken, expirationTime);
                 setIsFetching(false);
             });
         } else if (!enteredPassword.trim().length) {

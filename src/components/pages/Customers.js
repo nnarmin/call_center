@@ -1,18 +1,15 @@
 import React, {useContext} from 'react';
 import AuthContext from "../store/auth-context";
-import Login from "./Login";
-import Customers from "./Customers";
 
-const Home = () =>  {
+const Customers = () =>  {
     const authContext= useContext(AuthContext);
     console.log(authContext);
     return (
         <React.Fragment>
-        {authContext.isLoggedIn && <Customers/>}
-        {!authContext.isLoggedIn && <Login/>}
+            <h1>Customers</h1>
         </React.Fragment>
     );
 
 };
 
-export default Home;
+export default Customers;
