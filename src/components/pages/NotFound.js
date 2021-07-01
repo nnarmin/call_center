@@ -1,12 +1,11 @@
 import React from 'react';
 
-const PaymentType = () =>  {
+const NotFound = () => {
     return (
         <React.Fragment>
-            <h1>PaymentType</h1>
+            <h1>Page Not Found</h1>
         </React.Fragment>
     );
-
 };
 
-export default PaymentType;
+export default NotFound;

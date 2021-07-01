@@ -1,8 +1,8 @@
 import React, {useState, useRef, useContext} from 'react';
+import { post } from '../api/Api';
 import jwt_decode from 'jwt-decode';
 
 import {Button, Spinner} from "react-bootstrap";
-import {LoginRequest} from "../api/Request";
 import AuthContext from "../store/auth-context";
 
 const Login = () => {
@@ -17,15 +17,18 @@ const Login = () => {
         setIsFetching(true);
         const enteredName = usernameInputRef.current.value;
         const enteredPassword = passwordInputRef.current.value;
+
         if (enteredPassword.trim().length && enteredName.trim().length) {
-            LoginRequest(enteredName, enteredPassword).then(data => {
-                const decoded_jwt= data && data.data && jwt_decode(data.data.idToken);
-                const expirationTime = new Date(
-                    new Date().getTime() + +decoded_jwt.exp * 1000
-                );
-                data && data.data && authCtx.login(data.data.idToken, expirationTime);
-                setIsFetching(false);
-            });
+            post('/users/auth', { username: enteredName, password: enteredPassword })
+                .then((res) => {
+                    setIsFetching(false);
+                    localStorage.setItem('jwt_token', res.idToken);
+                    const decoded_jwt= res &&  jwt_decode(res.idToken);
+                    const expirationTime = new Date(
+                        new Date().getTime() + +decoded_jwt.exp * 1000
+                    );
+                    res && authCtx.login(res.idToken, expirationTime);
+                })
         } else if (!enteredPassword.trim().length) {
 
         }
@@ -41,12 +44,12 @@ const Login = () => {
                                 <div className="form-group">
                                     <label htmlFor="fname">İstifadəçi adı:</label>
                                     <input type="text" id="username" name="username" className="form-control"
-                                           ref={usernameInputRef}/>
+                                           ref={usernameInputRef} required/>
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="lname">Şifrə:</label>
                                     <input type="password" id="password" name="password" className="form-control"
-                                           ref={passwordInputRef}/>
+                                           ref={passwordInputRef} required/>
                                 </div>
                                 <Button type="submit" variant="primary">
                                     Daxil Ol

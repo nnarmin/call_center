@@ -5,11 +5,10 @@ import Customers from "./Customers";
 
 const Home = () =>  {
     const authContext= useContext(AuthContext);
-    console.log(authContext);
     return (
         <React.Fragment>
-        {authContext.isLoggedIn && <Customers/>}
-        {!authContext.isLoggedIn && <Login/>}
+            {authContext.isLoggedIn && <Customers/>}
+            {!authContext.isLoggedIn && <Login/>}
         </React.Fragment>
     );
 

@@ -1,11 +1,13 @@
 import {useContext} from 'react';
-import Home from './components/pages/Home'
-import Login from './components/pages/Login'
-import PaymentType from './components/pages/PaymentType';
-import SocialType from './components/pages/SocialType'
-import CustomerInfo from './components/pages/CustomerInfo'
+import PrivateRoute from "./components/helpers/PrivateRoute";
+import Home from './components/pages/Home';
+import Login from './components/pages/Login';
+import PaymentType from './components/pages/PaymentType/PaymentType';
+import NewPayment from './components/pages/PaymentType/NewPayment';
+import SocialType from './components/pages/SocialType/SocialType';
+import StatusType from './components/pages/StatusType/StatusType';
+import CustomerInfo from './components/pages/CustomerInfo';
 import {
-    Redirect,
     Switch,
     Route
 } from "react-router-dom";
@@ -27,24 +29,11 @@ function App() {
                         <Login/>
                     </Route>
                 )}
-                {authCtx.isLoggedIn && (
-                    <Route path='/paymentType'>
-                        <PaymentType/>
-                    </Route>
-                )}
-                {authCtx.isLoggedIn && (
-                    <Route path='/socialType'>
-                        <SocialType/>
-                    </Route>
-                )}
-                {authCtx.isLoggedIn && (
-                    <Route path='/customerInfo/:customerID'>
-                        <CustomerInfo/>
-                    </Route>
-                )}
-                <Route path='*'>
-                    <Redirect to='/'/>
-                </Route>
+                <PrivateRoute path='/paymentType' component={PaymentType}/>
+                <PrivateRoute path='/paymentMethod/add' component={NewPayment}/>
+                <PrivateRoute path='/socialType' component={SocialType}/>
+                <PrivateRoute path='/statusType' component={StatusType}/>
+                <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
             </Switch>
         </Layout>
     );
