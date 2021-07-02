@@ -1,0 +1,14 @@
+.table-actions{
+    width: 150px;
+}
+
+.delete-button{
+    cursor: pointer;
+}
+
+input:focus,
+button:focus,
+textarea:focus{
+    outline: 0;
+    box-shadow: none!important;
+}

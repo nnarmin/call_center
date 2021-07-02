@@ -5,7 +5,7 @@ import {get, remove} from '../../api/Api';
 import {Table, Card, Button} from "react-bootstrap";
 import Loader from "react-loader-spinner";
 
-const StatusList = () => {
+const SocialList = () => {
 
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [hasErr, setHasErr] = useState(false);
@@ -14,7 +14,7 @@ const StatusList = () => {
     const [res, setResponse] = useState(0);
 
     const getResponseData = () => {
-        get(`/status-types?page=${page}&size=10`)
+        get(`/social-types?page=${page}&size=10`)
             .then((res) => {
                 setIsFetchingData(false);
                 setResponse(res);
@@ -31,7 +31,7 @@ const StatusList = () => {
     }, [page]);
 
     const deleteHandle = (id) => {
-        remove(`/status-types/${id}`).then((res) => {
+        remove(`/social-types/${id}`).then((res) => {
             getResponseData();
         })
     };
@@ -71,7 +71,7 @@ const StatusList = () => {
                         <td className='table-actions text-right'>
                             <Link
                                 className='mr-3 btn-xs'
-                                to={`/statusType/add?edit=true&id=${id}`}
+                                to={`/socialType/add?edit=true&id=${id}`}
                             >
                                 <i className='fas fa-edit fa-sm text-success'/>
                             </Link>
@@ -120,4 +120,4 @@ const StatusList = () => {
     );
 };
 
-export default StatusList;
+export default SocialList;

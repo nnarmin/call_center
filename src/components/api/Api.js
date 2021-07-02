@@ -1,51 +1,14 @@
-/*import axios from 'axios';
-
-const instance = axios.create({
-    baseURL: 'http://192.168.3.171:8081/api/v1',
-    timeout: 1000,
-});
-
-export const makeRequest = (type, path, body) => instance[type](path, body)
-    .then(function (response) {
-        return response;
-    })
-    .catch(function (error) {
-        return error;
-    });
-
-instance.interceptors.response.use(function (response) {
-    return response;
-}, function (error) {
-    console.log(error);
-    return Promise.reject(error);
-});*/
-
 import axios from 'axios';
 import { store } from 'react-notifications-component';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://192.168.3.171:8081/api/v1',
+    baseURL: 'http://159.89.43.254:8081/api/v1',
 });
 
 export const get = (url) => axiosInstance.get(url).then((res) => res.data);
 export const post = (url, data) => axiosInstance.post(url, data).then((res) => res.data);
 export const put = (url, data) => axiosInstance.put(url, data).then((res) => res.data);
 export const remove = (url, data) => axiosInstance.delete(url, data).then((res) => res.data);
-
-/*const MessageComponent = ({ text }) => (
-    <span style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center' }}>
-    <span
-        style={{
-            fontWeight: 500,
-            fontSize: 16,
-            lineHeight: '24px',
-            color: '#FFEDED',
-        }}
-    >
-      {text}
-    </span>
-  </span>
-);*/
 
 axiosInstance.interceptors.request.use((config) => {
     const jwt = localStorage.getItem('jwt_token');
@@ -70,7 +33,7 @@ axiosInstance.interceptors.response.use((res) => {
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
-                duration: 2500,
+                duration: 1000,
                 onScreen: true
             }
         });
@@ -85,7 +48,7 @@ axiosInstance.interceptors.response.use((res) => {
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
-                duration: 2500,
+                duration: 1000,
                 onScreen: true
             }
         });
@@ -107,7 +70,7 @@ axiosInstance.interceptors.response.use((res) => {
             animationIn: ["animate__animated", "animate__fadeIn"],
             animationOut: ["animate__animated", "animate__fadeOut"],
             dismiss: {
-                duration: 2500,
+                duration: 1000,
                 onScreen: true
             }
         });

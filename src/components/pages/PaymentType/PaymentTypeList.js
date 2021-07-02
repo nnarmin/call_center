@@ -3,10 +3,10 @@ import {Link} from 'react-router-dom';
 
 import {get, remove} from '../../api/Api';
 import {Table, Card, Button} from "react-bootstrap";
-
+import Loader from "react-loader-spinner";
 const PaymentList = () => {
 
-    const [isLoading, setIsloading] = useState(true);
+    const [isFetchingData, setIsFetchingData] = useState(true);
     const [hasErr, setHasErr] = useState(false);
     const [page, setPage] = useState(0);
     const [rowNums, setRowNums] = useState(0);
@@ -15,12 +15,12 @@ const PaymentList = () => {
     const getResponseData = () => {
         get(`/payment-types?page=${page}&size=10`)
             .then((res) => {
-                setIsloading(false);
+                setIsFetchingData(false);
                 setResponse(res);
                 setRowNums(page === 0 ? 1 : (page * 10) + 1);
             })
             .catch((err) => {
-                setIsloading(false);
+                setIsFetchingData(false);
                 setHasErr(true);
             });
     };
@@ -35,19 +35,26 @@ const PaymentList = () => {
         })
     };
 
-    if (isLoading) {
-        return <p>Loading..</p>
+    if (isFetchingData) {
+        return (
+            <div className="card">
+                <div className="card-body d-flex align-items-center justify-content-center">
+                    <Loader
+                        type="ThreeDots"
+                        color="#00BFFF"
+                        height={60}
+                        width={60}/>
+                </div>
+            </div>
+        )
     }
 
     if (hasErr) {
         return <></>;
     }
     return (
-        <Card>
-            <Card.Body>
-                <Link to="/paymentMethod/add" className="d-flex justify-content-end mb-3"><Button variant="primary"> Yeni
-                        Ödəniş üsulu </Button></Link>
-                <Table bordered>
+            <>
+            <Table bordered>
                     <thead>
                     <tr>
                         <th>#</th>
@@ -58,17 +65,17 @@ const PaymentList = () => {
                     <tbody>
                     {res?.content && res.content.map(({id, name}, i) => (
                         <tr key={id}>
-                            <td className='library-table-index'>{+i + rowNums}</td>
+                            <td className='table-index'>{+i + rowNums}</td>
                             <td>{name}</td>
-                            <td className='library-table-actions'>
+                            <td className='table-actions text-right'>
                                 <Link
-                                    className='mr-2 btn-xs'
-                                    to={`template/add?edit=true&id=${id}`}
+                                    className='mr-3 btn-xs'
+                                    to={`paymentMethod/add?edit=true&id=${id}`}
                                 >
-                                    <i className='fas fa-edit fa-sm text-warning'/>
+                                    <i className='fas fa-edit fa-sm text-success'/>
                                 </Link>
-                                <span className='mr-sm btn-xs delete2' onClick={deleteHandle.bind(this, id)}>
-                                    <i className='fas fa-trash fa-sm text-danger'/>
+                                <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
+                                    <i className="fas fa-trash-alt fa-sm text-danger"/>
                                 </span>
                             </td>
                         </tr>
@@ -108,8 +115,7 @@ const PaymentList = () => {
                         </div>
                     </div>
                 </div>
-            </Card.Body>
-        </Card>
+            </>
     );
 };
 

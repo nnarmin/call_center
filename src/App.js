@@ -2,17 +2,25 @@ import {useContext} from 'react';
 import PrivateRoute from "./components/helpers/PrivateRoute";
 import Home from './components/pages/Home';
 import Login from './components/pages/Login';
-import PaymentType from './components/pages/PaymentType/PaymentType';
-import NewPayment from './components/pages/PaymentType/NewPayment';
-import SocialType from './components/pages/SocialType/SocialType';
-import StatusType from './components/pages/StatusType/StatusType';
-import CustomerInfo from './components/pages/CustomerInfo';
 import {
     Switch,
     Route
 } from "react-router-dom";
 import Layout from "./components/components/Layout/layout";
 import AuthContext from "./components/store/auth-context";
+
+import PaymentType from './components/pages/PaymentType/PaymentType';
+import PaymentAddEdit from './components/pages/PaymentType/PaymentAddEdit';
+
+import SocialType from './components/pages/SocialType/SocialType';
+import SocialAddEdit from './components/pages/SocialType/SocialAddEdit';
+
+import StatusType from './components/pages/StatusType/StatusType';
+import StatusAddEdit from './components/pages/StatusType/StatusAddEdit';
+
+import Customers from './components/pages/Customer/Customers';
+import CustomerInfo from './components/pages/Customer/CustomerInfo';
+import CustomerAddEdit from './components/pages/Customer/CustomerAddEdit';
 
 function App() {
 
@@ -30,10 +38,14 @@ function App() {
                     </Route>
                 )}
                 <PrivateRoute path='/paymentType' component={PaymentType}/>
-                <PrivateRoute path='/paymentMethod/add' component={NewPayment}/>
-                <PrivateRoute path='/socialType' component={SocialType}/>
-                <PrivateRoute path='/statusType' component={StatusType}/>
+                <PrivateRoute path='/paymentMethod/add' component={PaymentAddEdit}/>
+                <PrivateRoute path='/socialType' exact component={SocialType}/>
+                <PrivateRoute path='/socialType/add' component={SocialAddEdit}/>
+                <PrivateRoute path='/statusType' exact component={StatusType}/>
+                <PrivateRoute path='/statusType/add' component={StatusAddEdit}/>
+                <PrivateRoute path='/customers' component={Customers}/>
                 <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
+                <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
             </Switch>
         </Layout>
     );
