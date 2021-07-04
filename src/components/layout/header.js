@@ -1,8 +1,8 @@
 import React, {useContext} from 'react';
 import {NavLink} from 'react-router-dom';
-import AuthContext from "../../store/auth-context";
+import AuthContext from "../store/auth-context";
 import {Button} from "react-bootstrap";
-import logo from '../../../assets/images/logo.png';
+import logo from '../../assets/images/logo.png';
 
 const Header = () => {
     const authCtx = useContext(AuthContext);

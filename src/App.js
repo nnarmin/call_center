@@ -6,7 +6,7 @@ import {
     Switch,
     Route
 } from "react-router-dom";
-import Layout from "./components/components/Layout/layout";
+import Layout from "./components/layout/layout";
 import AuthContext from "./components/store/auth-context";
 
 import PaymentType from './components/pages/PaymentType/PaymentType';

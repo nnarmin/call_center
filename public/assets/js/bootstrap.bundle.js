@@ -2551,7 +2551,7 @@
 
     if (visualViewport) {
       width = visualViewport.width;
-      height = visualViewport.height; // Uses Layout Viewport (like Chrome; Safari does not currently)
+      height = visualViewport.height; // Uses layout Viewport (like Chrome; Safari does not currently)
       // In Chrome, it returns a value very close to 0 (+/-) but contains rounding
       // errors due to floating point numbers, so we need to check precision.
       // Safari returns a number <= 0, usually < -1 when pinch-zoomed

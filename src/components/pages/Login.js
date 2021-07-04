@@ -9,6 +9,7 @@ const Login = () => {
     const [isFetching, setIsFetching] = useState(false);
     const passwordInputRef = useRef();
     const usernameInputRef = useRef();
+    const [errMessage, setErrorMessage] = useState('');
 
     const authCtx = useContext(AuthContext);
 
@@ -28,6 +29,10 @@ const Login = () => {
                         new Date().getTime() + +decoded_jwt.exp * 1000
                     );
                     res && authCtx.login(res.idToken, expirationTime);
+                    setErrorMessage('');
+                }).catch((err) => {
+                    setIsFetching(false);
+                    setErrorMessage(err?.response?.data?.message || 'Xəta baş verdi');
                 })
         } else if (!enteredPassword.trim().length) {
 
@@ -51,6 +56,7 @@ const Login = () => {
                                     <input type="password" id="password" name="password" className="form-control"
                                            ref={passwordInputRef} required/>
                                 </div>
+                                <div className="text-danger font-weight-semibold mb-2">{errMessage}</div>
                                 <Button type="submit" variant="primary">
                                     Daxil Ol
                                     {isFetching
