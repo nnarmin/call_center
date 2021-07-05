@@ -12,3 +12,11 @@ textarea:focus{
     outline: 0;
     box-shadow: none!important;
 }
+
+.search-icon{
+    position: absolute;
+    top: 42px;
+    right: 10px;
+    font-size: 16px;
+    color: #737373;
+}

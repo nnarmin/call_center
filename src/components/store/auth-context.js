@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import jwt_decode from 'jwt-decode';
 
 const AuthContext = React.createContext({
@@ -20,8 +20,14 @@ export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const token_decoded =localStorage.getItem('jwt_token') && jwt_decode(localStorage.getItem('jwt_token'));
     const [decoded_token, setDecodedToken] = useState(token_decoded);
-
+    // const [isExpired, setIsExpired] = useState(false);
     const isLoggedIn = !!token;
+
+    // useEffect(()=>{
+    //     if(new Date().getTime >= decoded_token?.exp){
+    //         isExpired = true;
+    //     }
+    // }, [])
 
     const logoutHandler = () => {
         setToken(null);
