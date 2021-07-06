@@ -37,11 +37,11 @@ function App() {
                         <Login/>
                     </Route>
                 )}
-                <PrivateRoute path='/payment-types' component={PaymentType}/>
+                <PrivateRoute path='/payment-types?page=0&size=10' component={PaymentType}/>
                 <PrivateRoute path='/payment-methods/add' component={PaymentAddEdit}/>
                 <PrivateRoute path='/social-types' exact component={SocialType}/>
                 <PrivateRoute path='/socialType/add' component={SocialAddEdit}/>
-                <PrivateRoute path='/statusType' exact component={StatusType}/>
+                <PrivateRoute path='/status-type' exact component={StatusType}/>
                 <PrivateRoute path='/statusType/add' component={StatusAddEdit}/>
                 <PrivateRoute path='/customers' component={Customers}/>
                 <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
