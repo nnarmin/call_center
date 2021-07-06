@@ -11,7 +11,6 @@ const SocialAddEdit = () => {
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
-    const [err, setErr] = useState(false);
 
     const isEditable = query.get("edit");
     const socialId = query.get("id");
@@ -24,7 +23,6 @@ const SocialAddEdit = () => {
                 setName(res.name)
             }).catch((err) => {
                 setIsFetchingData(false);
-                setErr(true);
             })
         }
     }, [isEditable, socialId]);
@@ -49,15 +47,10 @@ const SocialAddEdit = () => {
                 setName('');
             }).catch((error) => {
                 setIsLoading(false);
-                setErr(true);
             });
         }
 
     };
-
-    if(err){
-        return <></>;
-    }
 
     if (isFetchingData) {
         return (

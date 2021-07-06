@@ -11,7 +11,6 @@ const PaymentAddEdit = () => {
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
-    const [err, setErr] = useState(false);
 
     const isEditable = query.get("edit");
     const paymentId = query.get("id");
@@ -24,7 +23,6 @@ const PaymentAddEdit = () => {
                 setName(res.name)
             }).catch((err) => {
                 setIsFetchingData(false);
-                setErr(true);
             })
         }
     }, [isEditable, paymentId]);
@@ -49,15 +47,10 @@ const PaymentAddEdit = () => {
                 setName('');
             }).catch((error) => {
                 setIsLoading(false);
-                setErr(true);
             });
         }
 
     };
-
-    if(err){
-        return <></>;
-    }
 
     if (isFetchingData) {
         return (

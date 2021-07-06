@@ -4,6 +4,7 @@ import {Link} from 'react-router-dom';
 import {get, remove} from '../../api/Api';
 import {Table, Card, Button} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+
 const PaymentList = () => {
 
     const [isFetchingData, setIsFetchingData] = useState(true);
@@ -35,6 +36,16 @@ const PaymentList = () => {
         })
     };
 
+    const handleLink = (page, isDisabled, event) => {
+        console.log(page)
+        console.log(isDisabled);
+        if(isDisabled){
+            event.preventDefault();
+        }else{
+            setPage(page);
+        }
+    }
+
     if (isFetchingData) {
         return (
             <div className="card">
@@ -53,69 +64,79 @@ const PaymentList = () => {
         return <></>;
     }
     return (
-            <>
+        <>
             <Table bordered>
-                    <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Ödəniş Növü</th>
-                        <th></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {res?.content && res.content.map(({id, name}, i) => (
-                        <tr key={id}>
-                            <td className='table-index'>{+i + rowNums}</td>
-                            <td>{name}</td>
-                            <td className='table-actions text-right'>
-                                <Link
-                                    className='mr-3 btn-xs'
-                                    to={`paymentMethod/add?edit=true&id=${id}`}
-                                >
-                                    <i className='fas fa-edit fa-sm text-success'/>
-                                </Link>
-                                <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
+                <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Ödəniş Növü</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {res?.content && res.content.map(({id, name}, i) => (
+                    <tr key={id}>
+                        <td className='table-index'>{+i + rowNums}</td>
+                        <td>{name}</td>
+                        <td className='table-actions text-right'>
+                            <Link
+                                className='mr-3 btn-xs'
+                                to={`paymentMethod/add?edit=true&id=${id}`}
+                            >
+                                <i className='fas fa-edit fa-sm text-success'/>
+                            </Link>
+                            <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
                                     <i className="fas fa-trash-alt fa-sm text-danger"/>
                                 </span>
-                            </td>
-                        </tr>
-                    ))}
-                    </tbody>
-                </Table>
-                <div className='row pt-2'>
-                    <div className='col-md-4'>
-                        <nav aria-label='Page navigation example p-0'>
-                            <ul className='pagination mb-0'>
-                                <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
+                        </td>
+                    </tr>
+                ))}
+                </tbody>
+            </Table>
+            <div className='row pt-2'>
+                <div className='col-md-4'>
+                    <nav aria-label='Page navigation example p-0'>
+                        <ul className='pagination mb-0'>
+                            <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
+                                <Link to={`/payment-types?page=${page - 1}&size=10`} onClick={(event) => {
+                                        handleLink.bind(this, page - 1, res?.first);
+                                }}>
                                     <button onClick={() => setPage(page - 1)} type='button' className='page-link'>
                                         Əvvəlki
                                     </button>
-                                </li>
-                                {Array.from(Array(res?.totalPages).keys()).map((num) => (
-                                    <li key={num} className={`page-item ${res?.number === num ? 'active' : ''}`}>
+                                </Link>
+                            </li>
+                            {Array.from(Array(res?.totalPages).keys()).map((num) => (
+                                <li key={num} className={`page-item ${res?.number === num ? 'active' : ''}`}>
+                                    <Link to={`/payment-types?page=${+num}&size=10`}
+                                          onClick={handleLink.bind(this, false, +num)}>
                                         <button onClick={() => setPage(num)} type='button'
                                                 className='page-link'>{+num + 1}</button>
-                                    </li>
-                                ))}
-                                <li className={`page-item ${res?.last ? 'disabled' : ''}`}>
+                                    </Link>
+                                </li>
+                            ))}
+                            <li className={`page-item ${res?.last ? 'disabled' : ''}`}>
+                                <Link to={`/payment-types?page=${page + 1}&size=10`}
+                                      onClick={handleLink.bind(this, page + 1, res?.last)}>
                                     <button onClick={() => setPage(page + 1)} type='button' className='page-link'>
                                         Növbəti
                                     </button>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                    <div className='col-md-4'>
-                        <div className='text-muted text-center'>
+                                </Link>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+                <div className='col-md-4'>
+                    <div className='text-muted text-center'>
                         <span>
                           Toplam məlumat:
                             {' '}
                             {res?.totalElements}
                         </span>
-                        </div>
                     </div>
                 </div>
-            </>
+            </div>
+        </>
     );
 };
 

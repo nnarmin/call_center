@@ -20,20 +20,21 @@ export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const token_decoded =localStorage.getItem('jwt_token') && jwt_decode(localStorage.getItem('jwt_token'));
     const [decoded_token, setDecodedToken] = useState(token_decoded);
-    // const [isExpired, setIsExpired] = useState(false);
     const isLoggedIn = !!token;
-
-    // useEffect(()=>{
-    //     if(new Date().getTime >= decoded_token?.exp){
-    //         isExpired = true;
-    //     }
-    // }, [])
 
     const logoutHandler = () => {
         setToken(null);
         localStorage.removeItem("jwt_token");
         window.location.href = '/login';
     };
+
+    useEffect(()=>{
+        if(new Date().getTime >= decoded_token?.exp){
+            logoutHandler();
+        }else{
+            console.log("New Date", new Date().getTime, "token exp", decoded_token?.exp)
+        }
+    }, []);
 
     const loginHandler = (token, expirationTime) => {
         setToken(token);

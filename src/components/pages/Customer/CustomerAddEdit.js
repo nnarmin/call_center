@@ -9,7 +9,6 @@ const CustomerAddEdit = () => {
 
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
-    const [err, setErr] = useState(false);
     const [formStep, setFormStep] = useState(1);
     const [userInfo, setUserInfo] = useState({name: '', surname: ''});
     const [userContact, setUserContact] = useState([]);
@@ -40,7 +39,6 @@ const CustomerAddEdit = () => {
                     setFormStep(2);
                 }).catch((err) => {
                     setIsLoading(false);
-                    setErr(false);
                 })
             }else{
                 post(`customers/`,{name: userInfo.name, surname: userInfo.surname}).then((res) => {
@@ -48,14 +46,9 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 }).catch((err) => {
                     setIsLoading(false);
-                    setErr(false);
                 })
             }
         }
-    }
-
-    if (err) {
-        return <></>
     }
 
     if (isFetchingData) {
