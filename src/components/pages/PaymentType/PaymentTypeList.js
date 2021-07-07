@@ -8,7 +8,7 @@ import Loader from "react-loader-spinner";
 const PaymentList = (props) => {
     const history = useHistory();
     let query = useQuery();
-    const currentPage = query.get("page");
+    const currentPage = query.get("page") || 0;
     const [page, setPage] = useState(currentPage);
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [rowNums, setRowNums] = useState(0);
@@ -17,7 +17,7 @@ const PaymentList = (props) => {
     const paginate = (n) => {
         setPage(n);
         history.push({
-            pathname: '/',
+            pathname: '/payment-types',
             search: '?page=' + n + '&size=10'
         })
     }
@@ -34,30 +34,28 @@ const PaymentList = (props) => {
             });
     };
 
-    console.log("currentPage", currentPage);
-
     useEffect(() => {
         getResponseData();
-        console.log("hello")
-    }, []);
+    }, [page]);
 
     const deleteHandle = (id) => {
+        setIsFetchingData(true)
         remove(`/payment-types/${id}`).then((res) => {
             getResponseData();
+            setIsFetchingData(false)
+        }).catch((error)=>{
+            setIsFetchingData(false)
         })
     };
 
-
     if (isFetchingData) {
         return (
-            <div className="card">
-                <div className="card-body d-flex align-items-center justify-content-center">
-                    <Loader
-                        type="ThreeDots"
-                        color="#00BFFF"
-                        height={60}
-                        width={60}/>
-                </div>
+            <div className="d-flex align-items-center justify-content-center">
+                <Loader
+                    type="ThreeDots"
+                    color="#00BFFF"
+                    height={60}
+                    width={60}/>
             </div>
         )
     }
@@ -80,7 +78,7 @@ const PaymentList = (props) => {
                         <td className='table-actions text-right'>
                             <Link
                                 className='mr-3 btn-xs'
-                                to={`paymentMethod/add?edit=true&id=${id}`}
+                                to={`payment-methods/add?edit=true&id=${id}`}
                             >
                                 <i className='fas fa-edit fa-sm text-success'/>
                             </Link>
@@ -97,8 +95,7 @@ const PaymentList = (props) => {
                     <nav aria-label='Page navigation example p-0'>
                         <ul className='pagination mb-0'>
                             <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
-
-                                <button onClick={paginate.bind(this, page-1)} type='button' className='page-link'>
+                                <button onClick={paginate.bind(this, page - 1)} type='button' className='page-link'>
                                     Əvvəlki
                                 </button>
                             </li>
@@ -109,7 +106,7 @@ const PaymentList = (props) => {
                                 </li>
                             ))}
                             <li className={`page-item ${res?.last ? 'disabled' : ''}`}>
-                                <button onClick={paginate.bind(this, page+1)} type='button' className='page-link'>
+                                <button onClick={paginate.bind(this, page + 1)} type='button' className='page-link'>
                                     Növbəti
                                 </button>
                             </li>

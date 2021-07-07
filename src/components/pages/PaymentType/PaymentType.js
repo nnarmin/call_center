@@ -15,7 +15,7 @@ const PaymentType = () => {
             <div className="col-lg-12 mr-auto ml-auto">
                 <Card>
                     <Card.Body>
-                        <Link to="/paymentMethod/add" className="d-flex justify-content-end mb-3">
+                        <Link to="/payment-methods/add" className="d-flex justify-content-end mb-3">
                             <Button variant="primary"> Yeni Ödəniş üsulu </Button>
                         </Link>
                         <PaymentList />

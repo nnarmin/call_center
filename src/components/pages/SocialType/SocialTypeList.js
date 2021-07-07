@@ -1,17 +1,27 @@
 import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useHistory} from 'react-router-dom';
 
 import {get, remove} from '../../api/Api';
-import {Table, Card, Button} from "react-bootstrap";
+import {Table} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+import {useQuery} from "../../hooks/useQuery";
 
 const SocialList = () => {
-
+    const history = useHistory();
+    let query = useQuery();
+    const currentPage = query.get("page") || 0;
     const [isFetchingData, setIsFetchingData] = useState(true);
-    const [hasErr, setHasErr] = useState(false);
-    const [page, setPage] = useState(0);
+    const [page, setPage] = useState(currentPage);
     const [rowNums, setRowNums] = useState(0);
     const [res, setResponse] = useState(0);
+
+    const paginate = (n) => {
+        setPage(n);
+        history.push({
+            pathname: '/social-type',
+            search: '?page=' + n + '&size=10'
+        })
+    }
 
     const getResponseData = () => {
         get(`/social-types?page=${page}&size=10`)
@@ -22,7 +32,6 @@ const SocialList = () => {
             })
             .catch((err) => {
                 setIsFetchingData(false);
-                setHasErr(true);
             });
     };
 
@@ -38,21 +47,16 @@ const SocialList = () => {
 
     if (isFetchingData) {
         return (
-            <div className="card">
-                <div className="card-body d-flex align-items-center justify-content-center">
-                    <Loader
-                        type="ThreeDots"
-                        color="#00BFFF"
-                        height={60}
-                        width={60}/>
-                </div>
+            <div className="d-flex align-items-center justify-content-center">
+                <Loader
+                    type="ThreeDots"
+                    color="#00BFFF"
+                    height={60}
+                    width={60}/>
             </div>
         )
     }
 
-    if (hasErr) {
-        return <></>;
-    }
     return (
         <>
             <Table bordered>
@@ -71,7 +75,7 @@ const SocialList = () => {
                         <td className='table-actions text-right'>
                             <Link
                                 className='mr-3 btn-xs'
-                                to={`/socialType/add?edit=true&id=${id}`}
+                                to={`/social-type/add?edit=true&id=${id}`}
                             >
                                 <i className='fas fa-edit fa-sm text-success'/>
                             </Link>
@@ -88,18 +92,18 @@ const SocialList = () => {
                     <nav aria-label='Page navigation example p-0'>
                         <ul className='pagination mb-0'>
                             <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
-                                <button onClick={() => setPage(page - 1)} type='button' className='page-link'>
+                                <button onClick={paginate.bind(this, page - 1)} type='button' className='page-link'>
                                     Əvvəlki
                                 </button>
                             </li>
                             {Array.from(Array(res?.totalPages).keys()).map((num) => (
                                 <li key={num} className={`page-item ${res?.number === num ? 'active' : ''}`}>
-                                    <button onClick={() => setPage(num)} type='button'
+                                    <button onClick={paginate.bind(this, num)} type='button'
                                             className='page-link'>{+num + 1}</button>
                                 </li>
                             ))}
                             <li className={`page-item ${res?.last ? 'disabled' : ''}`}>
-                                <button onClick={() => setPage(page + 1)} type='button' className='page-link'>
+                                <button onClick={paginate.bind(this, page + 1)} type='button' className='page-link'>
                                     Növbəti
                                 </button>
                             </li>

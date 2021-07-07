@@ -9,7 +9,7 @@ const StatusType = () => {
             <div className="col-lg-12 mr-auto ml-auto">
                 <Card>
                     <Card.Body>
-                        <Link to="/statusType/add" className="d-flex justify-content-end mb-3"><Button
+                        <Link to="/status-type/add" className="d-flex justify-content-end mb-3"><Button
                             variant="primary"> Yeni
                             Status </Button></Link>
                         <StatusList/>

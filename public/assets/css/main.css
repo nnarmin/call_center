@@ -1,3 +1,18 @@
+@font-face {
+    font-family: Roboto;
+    src: url(../fonts/Roboto-Regular.ttf);
+}
+
+@font-face {
+    font-family: Roboto-Medium;
+    src: url(../fonts/Roboto-Medium.ttf);
+}
+
+@font-face {
+    font-family: Poppins;
+    src: url(../fonts/Poppins-SemiBold.ttf);
+}
+
 .table-actions{
     width: 150px;
 }
@@ -23,4 +38,18 @@ textarea:focus{
 
 a:hover{
     text-decoration: none!important;
+}
+
+.flex-1{
+    flex: 1;
+}
+
+.btn{
+    font-family: Roboto-Medium;
+    text-transform: capitalize!important;
+    font-size: 0.9rem!important;
+}
+
+.table th{
+    font-family: Roboto-Medium;
 }

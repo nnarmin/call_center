@@ -20,6 +20,7 @@ const Login = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         if (enteredPassword.trim().length && enteredName.trim().length) {
+            console.log(enteredName, enteredPassword)
             post('/users/auth', { username: enteredName, password: enteredPassword })
                 .then((res) => {
                     setIsFetching(false);
@@ -31,6 +32,7 @@ const Login = () => {
                     res && authCtx.login(res.idToken, expirationTime);
                     setErrorMessage('');
                 }).catch((err) => {
+                    console.log("error");
                     setIsFetching(false);
                     setErrorMessage(err?.response?.data?.message || 'Xəta baş verdi');
                 })

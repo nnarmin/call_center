@@ -35,13 +35,13 @@ const StatusAddEdit = () => {
         event.preventDefault();
         setIsLoading(true);
 
-        if(isEditable){
+        if (isEditable) {
             put(`/status-types/${socialId}`, {name: name}).then((res) => {
                 setIsLoading(false);
             }).catch((error) => {
                 setIsLoading(false);
             });
-        }else{
+        } else {
             post('/status-types', {name: name}).then((res) => {
                 setIsLoading(false);
                 setName('');
@@ -54,14 +54,12 @@ const StatusAddEdit = () => {
 
     if (isFetchingData) {
         return (
-            <div className="card">
-                <div className="card-body d-flex align-items-center justify-content-center">
-                    <Loader
-                        type="ThreeDots"
-                        color="#00BFFF"
-                        height={60}
-                        width={60}/>
-                </div>
+            <div className="d-flex align-items-center justify-content-center">
+                <Loader
+                    type="ThreeDots"
+                    color="#00BFFF"
+                    height={60}
+                    width={60}/>
             </div>
         )
     }

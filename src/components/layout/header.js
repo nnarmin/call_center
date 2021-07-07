@@ -11,8 +11,6 @@ const Header = () => {
         authCtx.logout();
     };
 
-    const role_user = authCtx.decoded_token && authCtx.decoded_token.sub;
-
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container">
@@ -23,9 +21,9 @@ const Header = () => {
                     src={logo}
                     alt='logo'
                 /></a>
-                <div className="d-flex align-items-center justify-content-between flex-1">
-                    {role_user === 'admin' && (
-                        <div>
+                <div className="d-flex justify-content-between flex-1">
+                    {authCtx.isAdmin && (
+                        <div className="flex-1">
                             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                                 <span className="navbar-toggler-icon"></span>
