@@ -10,13 +10,6 @@ const AuthContext = React.createContext({
     isAdmin: false
 });
 
-const calculateRemainingTime = (expirationTime) => {
-    const current_time = new Date().getTime();
-    const expiration_Time = new Date(expirationTime).getTime();
-
-    return expiration_Time-current_time;
-};
-
 export const AuthContextProvider = (props) => {
     const [token, setToken] = useState(!!localStorage.getItem('jwt_token'));
     const token_decoded =localStorage.getItem('jwt_token') && jwt_decode(localStorage.getItem('jwt_token'));
@@ -37,24 +30,13 @@ export const AuthContextProvider = (props) => {
                 return;
             }
         })
-    }, [isAdmin])
-
-   /* useEffect(()=>{
-        if(new Date().getTime >= decoded_token?.exp){
-            logoutHandler();
-        }else{
-            console.log("New Date", new Date().getTime, "token exp", decoded_token?.exp)
-        }
-    }, []);*/
+    }, [isAdmin]);
 
     const loginHandler = (token, expirationTime) => {
         setToken(token);
         localStorage.setItem("jwt_token", token);
         window.location.href = '/';
         setDecodedToken(jwt_decode(token));
-/*
-        const remainingTime=calculateRemainingTime(expirationTime);
-        setTimeout(logoutHandler, remainingTime);*/
     };
 
     const contextValue = {

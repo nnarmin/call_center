@@ -4,6 +4,8 @@ import {useQuery} from "../../hooks/useQuery";
 import {get, remove} from '../../api/Api';
 import {Table} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+import PaginationComponent from "../../others/pagination";
+
 
 const PaymentList = (props) => {
     const history = useHistory();
@@ -90,6 +92,7 @@ const PaymentList = (props) => {
                 ))}
                 </tbody>
             </Table>
+            {/*<PaginationComponent result={res} currentPage={page} paginate={paginate.bind(this, currentPage)}/>*/}
             <div className='row pt-2'>
                 <div className='col-md-4'>
                     <nav aria-label='Page navigation example p-0'>
