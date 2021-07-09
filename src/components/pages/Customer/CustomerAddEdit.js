@@ -11,18 +11,33 @@ const CustomerAddEdit = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [formStep, setFormStep] = useState(1);
-    const [userInfo, setUserInfo] = useState({name: '', surname: ''});
-    const [userContact, setUserContact] = useState([
-        {
+
+    const isEditable = query.get('edit');
+    const userId = query.get('userId');
+
+    const [userState, setUserState] = useState({
+        name: '',
+        surname: '',
+        contacts: [{
             "customer": {
                 "id": ''
             },
             "contact": ""
-        },
-    ]);
-
-    const isEditable = query.get('edit');
-    const userId = query.get('userId');
+        }],
+        addresses: [{
+            "customer": {
+                "id": ''
+            },
+            "address": ""
+        }],
+        notes: [{
+            "customer": {
+                "id": ''
+            },
+            "note": ""
+        }],
+        id: ''
+    })
 
     useEffect(() => {
         if (isEditable) {
@@ -37,29 +52,45 @@ const CustomerAddEdit = () => {
     }, [isEditable, userId]);
 
     const addNewInput = () => {
-        setUserContact(prevState => [...prevState, {
+        const contacts = [...userState.contacts, {
             "customer": {
-                "id": userInfo?.id
+                "id": userState.id
             },
             "contact": ""
-        }])
+        }];
+        setUserState((prevState) => (
+            {
+                ...prevState,
+                contacts
+            }
+        ));
     }
 
     const deleteHandle = (key) => {
-        let values = [...userContact];
-        values.splice(key, 1);
-        setUserContact(values);
+        let contacts = [...userState.contacts];
+        contacts.splice(key, 1);
+        setUserState((prevState) => (
+            {
+                ...prevState,
+                contacts
+            }
+        ));
     }
 
     const handleChange = (i, id, event) => {
-        let values = [...userContact];
-        values[i] = {
+        let contacts = [...userState.contacts];
+        contacts[i] = {
             "customer": {
                 "id": id
             },
             "contact": event.target.value
         };
-        setUserContact(values);
+        setUserState((prevState) => (
+            {
+                ...prevState,
+                contacts
+            }
+        ));
     }
 
     const onSubmitHandler = (event) => {
@@ -67,16 +98,29 @@ const CustomerAddEdit = () => {
         setIsLoading(true);
         if (formStep === 1) {
             if (isEditable) {
-                put(`customers/${userId}`, {name: userInfo.name, surname: userInfo.surname}).then((res) => {
-                    setUserInfo(res);
+                put(`customers/${userId}`, {name: userState.name, surname: userState.surname}).then((res) => {
+                    setUserState((prevState) => (
+                        {
+                            ...prevState,
+                            name: res.name,
+                            surname: res.surname,
+                            id: res.id
+                        }
+                    ));
                     setIsLoading(false);
                     setFormStep(2);
                 }).catch((err) => {
                     setIsLoading(false);
                 });
             } else {
-                post(`customers/`, {name: userInfo.name, surname: userInfo.surname}).then((res) => {
-                    setUserInfo(res);
+                post(`customers/`, {name: userState.name, surname: userState.surname}).then((res) => {
+                    setUserState((prevState) => ({
+                            ...prevState,
+                            name: res.name,
+                            surname: res.surname,
+                            id: res.id
+                        }
+                    ));
                     setIsLoading(false);
                     setFormStep(2);
                 }).catch((err) => {
@@ -84,14 +128,15 @@ const CustomerAddEdit = () => {
                 })
             }
         } else if (formStep === 2) {
+            console.log(userState.contacts);
             if (isEditable) {
-                put(`customer-contacts/batch`, userContact).then((res) => {
+                put(`customer-contacts/batch`, userState.contacts).then((res) => {
                     history.push('/');
                 }).catch((err) => {
                     setIsLoading(false);
                 });
             } else {
-                post(`customer-contacts/batch`, userContact).then((res) => {
+                post(`customer-contacts/batch`, userState.contacts).then((res) => {
                     history.push('/');
                     setIsLoading(false);
                 }).catch((err) => {
@@ -125,10 +170,10 @@ const CustomerAddEdit = () => {
                                 <div className="form-group">
                                     <label>Ad</label>
                                     <input type="text" className="form-control"
-                                           value={userInfo.name}
+                                           value={userState.name}
                                            required
                                            onChange={(event) => {
-                                               setUserInfo((prevState) => ({
+                                               setUserState((prevState) => ({
                                                    ...prevState,
                                                    name: event.target.value
                                                }))
@@ -139,10 +184,10 @@ const CustomerAddEdit = () => {
                                 <div className="form-group">
                                     <label>Soyad</label>
                                     <input type="text" className="form-control"
-                                           value={userInfo.surname}
+                                           value={userState.surname}
                                            required
                                            onChange={(event) => {
-                                               setUserInfo((prevState) => ({
+                                               setUserState((prevState) => ({
                                                    ...prevState,
                                                    surname: event.target.value
                                                }))
@@ -170,14 +215,14 @@ const CustomerAddEdit = () => {
                 <form onSubmit={onSubmitHandler}>
                     <Card.Body>
                         <div className="row">
-                            {userContact.length
-                                ? userContact.map((contactInfo, i) => (
+                            {userState.contacts?.length
+                                ? userState.contacts.map((contactInfo, i) => (
                                     <div className="col-md-6" key={i}>
                                         <div className="form-group">
                                             <input type="text" className="form-control"
                                                    value={contactInfo.contact}
                                                    required
-                                                   onChange={handleChange.bind(this, i, userInfo.id)}/>
+                                                   onChange={handleChange.bind(this, i, userState.id)}/>
                                         </div>
                                         <span className='ml-2 btn-xs delete-button'
                                               onClick={deleteHandle.bind(this, i)}>
@@ -212,7 +257,7 @@ const CustomerAddEdit = () => {
             </Card>
         )
     } else if (formStep === 2) {
-        return(
+        return (
             <Card>
                 <Card.Header>
                     <h3>Ünvan</h3>

@@ -20,7 +20,7 @@ const Customers = () => {
                             <ul className="nav nav-tabs mb-3" id="ex1" role="tablist">
                                 <li className="nav-item" role="presentation">
                                     <a
-                                        className="nav-link active"
+                                        className="nav-link font-family-Roboto-Medium active"
                                         data-mdb-toggle="tab"
                                         href="#search_by_name"
                                         role="tab"
@@ -30,7 +30,7 @@ const Customers = () => {
                                 </li>
                                 <li className="nav-item" role="presentation">
                                     <a
-                                        className="nav-link"
+                                        className="nav-link font-family-Roboto-Medium"
                                         data-mdb-toggle="tab"
                                         href="#search_by_phone"
                                         role="tab"
@@ -40,7 +40,7 @@ const Customers = () => {
                                 </li>
                                 <li className="nav-item" role="presentation">
                                     <a
-                                        className="nav-link"
+                                        className="nav-link font-family-Roboto-Medium"
                                         data-mdb-toggle="tab"
                                         href="#search_by_address"
                                         role="tab"
@@ -56,15 +56,26 @@ const Customers = () => {
                                     role="tabpanel"
                                     aria-labelledby="ex1-tab-1"
                                 >
-                                    <Search label="Ad üzrə axtarış" placeholder="Axtarış.." search_url="/customers/search?name.contains"/>
+                                    <div className="row">
+                                        <div className="col-md-6 mb-2">
+                                            <Search label="Ad üzrə axtarış" className="flex-1" type="name" placeholder="Axtarış.."
+                                                    search_url="/customers/search?name.contains"/>
+                                        </div>
+                                        <div className="col-md-6 mb-2">
+                                            <Search label="Soyad üzrə axtarış" className="flex-1" type="surname" placeholder="Axtarış.."
+                                                    search_url="/customers/search?surname.contains"/>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="tab-pane fade" id="search_by_phone" role="tabpanel"
                                      aria-labelledby="ex1-tab-2">
-                                    <Search label="Nömrə üzrə axtarış" placeholder="Axtarış.." search_url="/customer-contacts/search?contact.contains"/>
+                                    <Search label="Nömrə üzrə axtarış" placeholder="Axtarış.." type="contact"
+                                            search_url="/customer-contacts/search?contact.contains"/>
                                 </div>
                                 <div className="tab-pane fade" id="search_by_address" role="tabpanel"
                                      aria-labelledby="ex1-tab-3">
-                                    <Search label="Ünvan üzrə axtarış" placeholder="Axtarış.." search_url="/customer-addresses/search?address.contains"/>
+                                    <Search label="Ünvan üzrə axtarış" placeholder="Axtarış.." type="address"
+                                            search_url="/customer-addresses/search?address.contains"/>
                                 </div>
                             </div>
                         </Card.Body>

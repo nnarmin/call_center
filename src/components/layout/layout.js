@@ -7,7 +7,7 @@ const Layout = (props) => {
         <React.Fragment>
             <Header/>
             <section className='content d-flex flex-column flex-column-fluid py-3'
-                     style={{minHeight: 'calc(100vh - 118px)'}}>
+                     style={{minHeight: 'calc(100vh - 120px)'}}>
                 <div className='container'>
                     {props.children}
                 </div>

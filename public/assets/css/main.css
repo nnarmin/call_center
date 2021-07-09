@@ -13,6 +13,14 @@
     src: url(../fonts/Poppins-SemiBold.ttf);
 }
 
+.font-family-Roboto-Medium {
+    font-family: Roboto-Medium;
+}
+
+.font-family-Poppins {
+    font-family: Poppins;
+}
+
 .table-actions{
     width: 150px;
 }
