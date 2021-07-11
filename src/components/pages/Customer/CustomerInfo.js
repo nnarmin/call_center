@@ -59,7 +59,7 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Əlaqə məlumatları</div>
-                                    <Link to="/" type="button" className="btn btn-success btn-floating">
+                                    <Link to="/customer/add?edit=true&type=contact" type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
@@ -73,7 +73,7 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Ünvan məlumatları</div>
-                                    <Link to="/" type="button" className="btn btn-success btn-floating">
+                                    <Link to="/customer/add?edit=true&type=address" type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
@@ -86,7 +86,7 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                    <Link to="/" type="button" className="btn btn-success btn-floating">
+                                    <Link to="/customer/add?edit=true&type=note" type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
