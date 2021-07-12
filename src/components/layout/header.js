@@ -14,7 +14,7 @@ const Header = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <div className="container">
-                <a className="navbar-brand mr-2" href="/"><img
+                <a className="navbar-brand mr-2 py-0 align-items-start" href="/"><img
                     style={{
                         maxWidth: '200px',
                     }}

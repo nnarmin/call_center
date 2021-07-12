@@ -23,7 +23,6 @@ const CustomerInfo = () => {
 
     const getUserInfo = (userID) => {
         get(`/customers/${userID}/full`).then((res) => {
-            console.log(res)
             setState(() => ({
                 name: res.name,
                 surname: res.surname,
@@ -59,12 +58,12 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Əlaqə məlumatları</div>
-                                    <Link to="/customer/add?edit=true&type=contact" type="button" className="btn btn-success btn-floating">
+                                    <Link to={`/customer/add?edit=true&id=${userID}&type=contact`} type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
                                 {state.contacts && state.contacts.map(({contact}, i) => (
-                                    <li className="list-group-item">{contact}</li>
+                                    <li className="list-group-item" key={i}>{contact}</li>
                                 ))}
                             </ul>
                         </div>
@@ -73,12 +72,12 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Ünvan məlumatları</div>
-                                    <Link to="/customer/add?edit=true&type=address" type="button" className="btn btn-success btn-floating">
+                                    <Link to={`/customer/add?edit=true&id=${userID}&type=address`} type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
                                 {state.addresses && state.addresses.map(({address}, i) => (
-                                    <li className="list-group-item">{address}</li>
+                                    <li className="list-group-item" key={i}>{address}</li>
                                 ))}
                             </ul>
                         </div>
@@ -86,12 +85,12 @@ const CustomerInfo = () => {
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                     <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                    <Link to="/customer/add?edit=true&type=note" type="button" className="btn btn-success btn-floating">
+                                    <Link to={`/customer/add?edit=true&id=${userID}&type=note`} type="button" className="btn btn-success btn-floating">
                                         <i className="fas fa-pen"/>
                                     </Link>
                                 </li>
                                 {state.notes && state.notes.map(({note}, i) => (
-                                    <li className="list-group-item">{note}</li>
+                                    <li className="list-group-item" key={i}>{note}</li>
                                 ))}
                             </ul>
                         </div>

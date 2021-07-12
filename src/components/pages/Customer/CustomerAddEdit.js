@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {useHistory} from "react-router-dom";
 import {useQuery} from "../../hooks/useQuery";
-import {get, post, put} from '../../api/Api';
+import {get, post, put, remove} from '../../api/Api';
 import {Button, Card} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const CustomerAddEdit = () => {
     let query = useQuery();
@@ -13,7 +14,8 @@ const CustomerAddEdit = () => {
     const [formStep, setFormStep] = useState(1);
 
     const isEditable = query.get('edit');
-    const userId = query.get('type');
+    const userId = query.get('id');
+    const type = query.get('type');
 
     const [userState, setUserState] = useState({
         name: '',
@@ -22,48 +24,81 @@ const CustomerAddEdit = () => {
             "customer": {
                 "id": ''
             },
+            "id": "",
             "contact": ""
         }],
         addresses: [{
             "customer": {
                 "id": ''
             },
+            "id": "",
             "address": ""
         }],
         notes: [{
             "customer": {
                 "id": ''
             },
+            "id": "",
             "note": ""
         }],
         id: ''
     })
 
-    useEffect(() => {
+    useEffect(async () => {
         if (isEditable) {
             setIsFetchingData(true);
-            get(`customers/${userId}`).then((res) => {
-                setIsFetchingData(false);
+            await get(`/customers/${userId}`).then(res => {
                 setUserState({
                     name: res.name,
                     surname: res.surname,
-                    id: res.id,
-                    contacts: res.contacts,
-                    addresses: res.addresses,
-                    notes: res.notes
+                    id: res.id
                 })
-                console.log(userState);
-            }).catch(() => {
+                setIsFetchingData(false);
+            }).catch(err => {
                 setIsFetchingData(false);
             })
+            if (type === "contact") {
+                await getData("contacts", "contact");
+            } else if (type === "address") {
+                await getData("addresses", "address");
+            } else if (type === "note") {
+                await getData("notes", "note");
+            }
         }
     }, [isEditable, userId]);
+
+    const getData = (type, fieldName) => {
+         get(`/customer-${type}/search?customerId.equals=${userId}&page=0&size=20`).then((res) => {
+            const dataArr = [];
+            console.log(res);
+            res.content.map(data => dataArr.push({
+                "customer": {
+                    "id": data.customer.id
+                },
+                [fieldName]: data[fieldName],
+                "id": data.id,
+                "modified_by": data.modifiedBy,
+                "modified_date": data.modifiedAt
+            }));
+            console.log(dataArr);
+            setUserState((prevState) => ({
+                    ...prevState,
+                    [type]: dataArr
+                }
+            ));
+            console.log(userState);
+            setIsFetchingData(false);
+        }).catch(() => {
+            setIsFetchingData(false);
+        })
+    }
 
     const addNewInput = (data, type) => {
         const alldata = [...userState[data], {
             "customer": {
                 "id": userState.id
             },
+            "id": "",
             [type]: ""
         }];
         setUserState((prevState) => (
@@ -74,7 +109,7 @@ const CustomerAddEdit = () => {
         ));
     }
 
-    const deleteHandle = (key, type) => {
+    const deleteHandle = (key, type, id) => {
         let data = [...userState[type]];
         data.splice(key, 1);
         setUserState((prevState) => (
@@ -83,17 +118,25 @@ const CustomerAddEdit = () => {
                 [type]: data
             }
         ));
+        if (isEditable && id) {
+            setIsFetchingData(true);
+            remove(`customer-${type}/${id}`).then(res => {
+                setIsFetchingData(false);
+            }).catch(err => {
+                setIsFetchingData(false);
+            })
+        }
     }
 
-    const handleChange = (i, id, inputGroup, type, event) => {
+    const handleChange = (i, id, inputGroup, type, typeId, event) => {
         let alldata = [...userState[inputGroup]];
         alldata[i] = {
             "customer": {
                 "id": id
             },
+            "id": typeId,
             [type]: event.target.value
         };
-        console.log(alldata);
         setUserState((prevState) => (
             {
                 ...prevState,
@@ -105,7 +148,7 @@ const CustomerAddEdit = () => {
     const onSubmitHandler = (event) => {
         event.preventDefault();
         setIsLoading(true);
-        if (formStep === 1) {
+        if (formStep === 1 && type === null) {
             if (isEditable) {
                 put(`customers/${userId}`, {name: userState.name, surname: userState.surname}).then((res) => {
                     setUserState((prevState) => (
@@ -116,8 +159,8 @@ const CustomerAddEdit = () => {
                             id: res.id
                         }
                     ));
+                    history.push(`/customerInfo/${userId}`)
                     setIsLoading(false);
-                    setFormStep(2);
                 }).catch((err) => {
                     setIsLoading(false);
                 });
@@ -136,11 +179,10 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 })
             }
-        } else if (formStep === 2) {
-            console.log(userState.contacts);
+        } else if (formStep === 2 || type === "contact") {
             if (isEditable) {
                 put(`customer-contacts/batch`, userState.contacts).then((res) => {
-                    setFormStep(3);
+                    history.push(`/customerInfo/${userId}`)
                     setIsLoading(false);
                 }).catch((err) => {
                     setIsLoading(false);
@@ -153,16 +195,15 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 })
             }
-        } else if (formStep === 3) {
+        } else if (formStep === 3 || type === "address") {
             if (isEditable) {
                 put(`customer-addresses/batch`, userState.addresses).then((res) => {
-                    setFormStep(4);
+                    history.push(`/customerInfo/${userId}`)
                     setIsLoading(false);
                 }).catch((err) => {
                     setIsLoading(false);
                 });
             } else {
-                console.log(userState.addresses)
                 post(`customer-addresses/batch`, userState.addresses).then((res) => {
                     setFormStep(4);
                     setIsLoading(false);
@@ -170,10 +211,11 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 })
             }
-        } else if (formStep === 4) {
+        } else if (formStep === 4 || type === "note") {
+            console.log(userState.notes)
             if (isEditable) {
                 put(`customer-notes/batch`, userState.notes).then((res) => {
-                    history.push(`/userInfo/${userState.id}`)
+                    history.push(`/customerInfo/${userId}`)
                     setIsLoading(false);
                 }).catch((err) => {
                     setIsLoading(false);
@@ -203,7 +245,7 @@ const CustomerAddEdit = () => {
         )
     }
 
-    if (formStep === 1) {
+    if (formStep === 1 && type === null) {
         return (
             <Card>
                 <Card.Body>
@@ -249,7 +291,7 @@ const CustomerAddEdit = () => {
                 </Card.Body>
             </Card>
         )
-    } else if (formStep === 2) {
+    } else if (formStep === 2 || type === "contact") {
         return (
             <Card>
                 <Card.Header>
@@ -260,19 +302,20 @@ const CustomerAddEdit = () => {
                         <div className="row">
                             {userState.contacts?.length
                                 ? userState.contacts.map((contactInfo, i) => (
-                                    <div className="col-md-6" key={i}>
+                                    <div className="col-md-6 mb-2" key={i}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-1">
                                                 <input type="text" className="form-control"
                                                        value={contactInfo.contact}
                                                        required
-                                                       onChange={handleChange.bind(this, i, userState.id, "contacts", "contact")}/>
+                                                       onChange={handleChange.bind(this, i, userState.id, "contacts", "contact", contactInfo.id)}/>
                                             </div>
-                                            <span className="ml-2 btn btn-danger btn-floating"
-                                                  onClick={deleteHandle.bind(this, i, "contacts")}>
+                                            <span className="ml-2 text-danger delete-button"
+                                                  onClick={deleteHandle.bind(this, i, "contacts", contactInfo.id)}>
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
                                         </div>
+                                        <div className="text-info">{contactInfo.modified_by} - {formattedDate(contactInfo.modified_date)}</div>
                                     </div>
 
                                 ))
@@ -301,7 +344,7 @@ const CustomerAddEdit = () => {
 
             </Card>
         )
-    } else if (formStep === 3) {
+    } else if (formStep === 3 || type === "address") {
         return (
             <Card>
                 <Card.Header>
@@ -312,16 +355,16 @@ const CustomerAddEdit = () => {
                         <div className="row">
                             {userState.addresses?.length
                                 ? userState.addresses.map((addressInfo, i) => (
-                                    <div className="col-md-6" key={i}>
+                                    <div className="col-md-6 mb-2" key={i}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-1">
                                                 <input type="text" className="form-control"
                                                        value={addressInfo.address}
                                                        required
-                                                       onChange={handleChange.bind(this, i, userState.id, "addresses", "address")}/>
+                                                       onChange={handleChange.bind(this, i, userState.id, "addresses", "address", addressInfo.id)}/>
                                             </div>
-                                            <span className="ml-2 btn btn-danger btn-floating"
-                                                  onClick={deleteHandle.bind(this, i, "addresses")}>
+                                            <span className="ml-2 text-danger"
+                                                  onClick={deleteHandle.bind(this, i, "addresses", addressInfo.id)}>
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
                                         </div>
@@ -352,7 +395,7 @@ const CustomerAddEdit = () => {
                 </form>
             </Card>
         )
-    } else if (formStep === 4) {
+    } else if (formStep === 4 || type === "note") {
         return (
             <Card>
                 <Card.Header>
@@ -363,16 +406,16 @@ const CustomerAddEdit = () => {
                         <div className="row">
                             {userState.notes?.length
                                 ? userState.notes.map((noteInfo, i) => (
-                                    <div className="col-md-6" key={i}>
+                                    <div className="col-md-6 mb-2" key={i}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-1">
                                                 <input type="text" className="form-control"
                                                        value={noteInfo.note}
                                                        required
-                                                       onChange={handleChange.bind(this, i, userState.id, "notes", "note")}/>
+                                                       onChange={handleChange.bind(this, i, userState.id, "notes", "note", noteInfo.id)}/>
                                             </div>
-                                            <span className="ml-2 btn btn-danger btn-floating"
-                                                  onClick={deleteHandle.bind(this, i, "notes")}>
+                                            <span className="ml-2 text-danger"
+                                                  onClick={deleteHandle.bind(this, i, "notes", noteInfo.id)}>
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
                                         </div>
