@@ -326,7 +326,7 @@ const CustomerAddEdit = () => {
                     </Card.Body>
                     <Card.Footer>
                         <div className="d-flex justify-content-between align-items-center">
-                            <div className="text-info">{userState.modified_by} - {formattedDate(userState.modified_date)}</div>
+                            <div className="text-info">Sonuncu dəyişiklik {userState.modified_by} tərəfindən {formattedDate(userState.modified_date)} tarixdə edilib.</div>
                             <div>
                                 <Button type="button"
                                         variant="success"
@@ -380,21 +380,24 @@ const CustomerAddEdit = () => {
                         </div>
                     </Card.Body>
                     <Card.Footer>
-                        <div className="d-flex justify-content-end">
-                            <Button type="button"
-                                    variant="success"
-                                    className="mt-2 mr-2"
-                                    onClick={addNewInput.bind(this, "addresses", "address")}
-                            >
-                                Yeni ünvan əlavə edin
-                            </Button>
-                            <Button type="submit"
-                                    variant="primary"
-                                    disabled={isLoading}
-                                    className="mt-2"
-                            >
-                                {isLoading ? 'Gözləyin…' : 'Əlavə et'}
-                            </Button>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div className="text-info">Sonuncu dəyişiklik {userState.modified_by} tərəfindən {formattedDate(userState.modified_date)} tarixdə edilib.</div>
+                            <div>
+                                <Button type="button"
+                                        variant="success"
+                                        className="mt-2 mr-2"
+                                        onClick={addNewInput.bind(this, "addresses", "address")}
+                                >
+                                    Yeni ünvan əlavə edin
+                                </Button>
+                                <Button type="submit"
+                                        variant="primary"
+                                        disabled={isLoading}
+                                        className="mt-2"
+                                >
+                                    {isLoading ? 'Gözləyin…' : 'Əlavə et'}
+                                </Button>
+                            </div>
                         </div>
                     </Card.Footer>
                 </form>
