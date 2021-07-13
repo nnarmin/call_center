@@ -1,7 +1,6 @@
 import React from 'react';
 
 const PaginationComponent = (props) =>{
-    const currentPage=props.currentPage
 
     return(
         <div className='row pt-2'>

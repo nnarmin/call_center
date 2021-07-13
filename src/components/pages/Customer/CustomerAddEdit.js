@@ -41,7 +41,10 @@ const CustomerAddEdit = () => {
             "id": "",
             "note": ""
         }],
-        id: ''
+        id: '',
+        created_by: '',
+        modified_by: '',
+        modified_date: '',
     })
 
     useEffect(async () => {
@@ -68,9 +71,8 @@ const CustomerAddEdit = () => {
     }, [isEditable, userId]);
 
     const getData = (type, fieldName) => {
-         get(`/customer-${type}/search?customerId.equals=${userId}&page=0&size=20`).then((res) => {
+        get(`/customer-${type}/search?customerId.equals=${userId}&page=0&size=20`).then((res) => {
             const dataArr = [];
-            console.log(res);
             res.content.map(data => dataArr.push({
                 "customer": {
                     "id": data.customer.id
@@ -80,13 +82,13 @@ const CustomerAddEdit = () => {
                 "modified_by": data.modifiedBy,
                 "modified_date": data.modifiedAt
             }));
-            console.log(dataArr);
             setUserState((prevState) => ({
                     ...prevState,
-                    [type]: dataArr
+                    [type]: dataArr,
+                    modified_by: dataArr[0]?.modified_by,
+                    modified_date: dataArr[0]?.modified_date,
                 }
             ));
-            console.log(userState);
             setIsFetchingData(false);
         }).catch(() => {
             setIsFetchingData(false);
@@ -295,14 +297,14 @@ const CustomerAddEdit = () => {
         return (
             <Card>
                 <Card.Header>
-                    <h3>Əlaqə vasitəsi</h3>
+                    <h4>Əlaqə vasitəsi</h4>
                 </Card.Header>
                 <form onSubmit={onSubmitHandler}>
                     <Card.Body>
                         <div className="row">
                             {userState.contacts?.length
                                 ? userState.contacts.map((contactInfo, i) => (
-                                    <div className="col-md-6 mb-2" key={i}>
+                                    <div className="col-md-6 mb-3" key={i}>
                                         <div className="d-flex align-items-center">
                                             <div className="flex-1">
                                                 <input type="text" className="form-control"
@@ -315,7 +317,7 @@ const CustomerAddEdit = () => {
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
                                         </div>
-                                        <div className="text-info">{contactInfo.modified_by} - {formattedDate(contactInfo.modified_date)}</div>
+
                                     </div>
 
                                 ))
@@ -323,21 +325,24 @@ const CustomerAddEdit = () => {
                         </div>
                     </Card.Body>
                     <Card.Footer>
-                        <div className="d-flex justify-content-end">
-                            <Button type="button"
-                                    variant="success"
-                                    className="mt-2 mr-2"
-                                    onClick={addNewInput.bind(this, "contacts", "contact")}
-                            >
-                                Yeni əlaqə növü əlavə edin
-                            </Button>
-                            <Button type="submit"
-                                    variant="primary"
-                                    disabled={isLoading}
-                                    className="mt-2"
-                            >
-                                {isLoading ? 'Gözləyin…' : 'Əlavə et'}
-                            </Button>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div className="text-info">{userState.modified_by} - {formattedDate(userState.modified_date)}</div>
+                            <div>
+                                <Button type="button"
+                                        variant="success"
+                                        className="mt-2 mr-2"
+                                        onClick={addNewInput.bind(this, "contacts", "contact")}
+                                >
+                                    Yeni əlaqə növü əlavə edin
+                                </Button>
+                                <Button type="submit"
+                                        variant="primary"
+                                        disabled={isLoading}
+                                        className="mt-2"
+                                >
+                                    {isLoading ? 'Gözləyin…' : 'Əlavə et'}
+                                </Button>
+                            </div>
                         </div>
                     </Card.Footer>
                 </form>
@@ -348,7 +353,7 @@ const CustomerAddEdit = () => {
         return (
             <Card>
                 <Card.Header>
-                    <h3>Ünvan</h3>
+                    <h4>Ünvan</h4>
                 </Card.Header>
                 <form onSubmit={onSubmitHandler}>
                     <Card.Body>
@@ -399,7 +404,7 @@ const CustomerAddEdit = () => {
         return (
             <Card>
                 <Card.Header>
-                    <h3>Qeydlər</h3>
+                    <h4>Qeydlər</h4>
                 </Card.Header>
                 <form onSubmit={onSubmitHandler}>
                     <Card.Body>

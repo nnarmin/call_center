@@ -1,4 +1,5 @@
-import {useContext} from 'react';
+import {useContext, useState, useEffect, createContext} from 'react';
+import {get} from './components/api/Api';
 import PrivateRoute from "./components/helpers/PrivateRoute";
 import Home from './components/pages/Home';
 import Login from './components/pages/Login';
@@ -22,32 +23,49 @@ import Customers from './components/pages/Customer/Customers';
 import CustomerInfo from './components/pages/Customer/CustomerInfo';
 import CustomerAddEdit from './components/pages/Customer/CustomerAddEdit';
 
+
+export const IsAuth = createContext(null);
+export const UserInfo = createContext(null);
+
 function App() {
 
-    const authCtx = useContext(AuthContext);
+    const [isUserAuth, setIsUserAuth] = useState(!!localStorage.getItem('jwt_token'));
+    const [userInfo, setUserInfo] = useState({});
+
+    useEffect(() => {
+        if (isUserAuth) {
+            get('/users/me')
+                .then(setUserInfo)
+                .catch(console.log);
+        }
+    }, [isUserAuth]);
 
     return (
-        <Layout>
-            <Switch>
-                <Route path='/' exact>
-                    <Home/>
-                </Route>
-                {!authCtx.isLoggedIn && (
-                    <Route path='/login'>
-                        <Login/>
-                    </Route>
-                )}
-                <PrivateRoute path='/payment-types' component={PaymentType}/>
-                <PrivateRoute path='/payment-methods/add' component={PaymentAddEdit}/>
-                <PrivateRoute path='/social-types' exact component={SocialType}/>
-                <PrivateRoute path='/social-type/add' component={SocialAddEdit}/>
-                <PrivateRoute path='/status-types' exact component={StatusType}/>
-                <PrivateRoute path='/status-type/add' component={StatusAddEdit}/>
-                <PrivateRoute path='/customers' component={Customers}/>
-                <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
-                <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
-            </Switch>
-        </Layout>
+        <IsAuth.Provider value={{isUserAuth, setIsUserAuth}}>
+            <UserInfo.Provider value={{userInfo, setUserInfo}}>
+                <Layout>
+                    <Switch>
+                        <Route path='/' exact>
+                            <Home/>
+                        </Route>
+                        {!isUserAuth && (
+                            <Route path='/login'>
+                                <Login/>
+                            </Route>
+                        )}
+                        <PrivateRoute path='/payment-types' component={PaymentType}/>
+                        <PrivateRoute path='/payment-methods/add' component={PaymentAddEdit}/>
+                        <PrivateRoute path='/social-types' exact component={SocialType}/>
+                        <PrivateRoute path='/social-type/add' component={SocialAddEdit}/>
+                        <PrivateRoute path='/status-types' exact component={StatusType}/>
+                        <PrivateRoute path='/status-type/add' component={StatusAddEdit}/>
+                        <PrivateRoute path='/customers' component={Customers}/>
+                        <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
+                        <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
+                    </Switch>
+                </Layout>
+            </UserInfo.Provider>
+        </IsAuth.Provider>
     );
 }
 
