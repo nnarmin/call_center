@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
 import {get, remove} from "../../api/Api";
 import {Card} from "react-bootstrap";
+import Loader from "react-loader-spinner";
 
 const CustomerInfo = () => {
 
@@ -9,6 +10,7 @@ const CustomerInfo = () => {
 
     const params = useParams();
     const userID = params.customerID;
+    const [isFetchingData, setIsFetchingData] = useState(true);
     const [state, setState] = useState({
         name: '',
         surname: '',
@@ -22,7 +24,9 @@ const CustomerInfo = () => {
     }, []);
 
     const getUserInfo = (userID) => {
+        setIsFetchingData(true);
         get(`/customers/${userID}/full`).then((res) => {
+            setIsFetchingData(false);
             setState(() => ({
                 name: res.name,
                 surname: res.surname,
@@ -32,6 +36,7 @@ const CustomerInfo = () => {
             }))
         }).catch((err) => {
             console.log(err);
+            setIsFetchingData(false);
         })
     }
 
@@ -39,6 +44,18 @@ const CustomerInfo = () => {
         remove(`customers/${userID}`).then((res) => {
             history.push('/customers');
         })
+    }
+
+    if (isFetchingData) {
+        return (
+            <div className="d-flex align-items-center justify-content-center">
+                <Loader
+                    type="ThreeDots"
+                    color="#00BFFF"
+                    height={60}
+                    width={60}/>
+            </div>
+        )
     }
 
     return (

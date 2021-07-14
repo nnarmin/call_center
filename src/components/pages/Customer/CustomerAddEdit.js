@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {useHistory} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
 import {useQuery} from "../../hooks/useQuery";
 import {get, post, put, remove} from '../../api/Api';
 import {Button, Card} from "react-bootstrap";
@@ -25,49 +25,60 @@ const CustomerAddEdit = () => {
                 "id": ''
             },
             "id": "",
-            "contact": ""
+            "contact": "",
+            "created_by": '',
+            "modified_by": '',
+            "modified_date": ''
         }],
         addresses: [{
             "customer": {
                 "id": ''
             },
             "id": "",
-            "address": ""
+            "address": "",
+            "created_by": '',
+            "modified_by": '',
+            "modified_date": ''
         }],
         notes: [{
             "customer": {
                 "id": ''
             },
             "id": "",
-            "note": ""
+            "note": "",
+            "created_by": '',
+            "modified_by": '',
+            "modified_date": ''
         }],
         id: '',
-        created_by: '',
-        modified_by: '',
-        modified_date: '',
+
     })
 
-    useEffect(async () => {
+    useEffect(() => {
+        let unmounted = false;
         if (isEditable) {
             setIsFetchingData(true);
-            await get(`/customers/${userId}`).then(res => {
+            get(`/customers/${userId}`).then(res => {
                 setUserState({
                     name: res.name,
                     surname: res.surname,
                     id: res.id
                 })
+                if (type === "contact") {
+                    getData("contacts", "contact");
+                } else if (type === "address") {
+                    getData("addresses", "address");
+                } else if (type === "note") {
+                    getData("notes", "note");
+                }
                 setIsFetchingData(false);
             }).catch(err => {
                 setIsFetchingData(false);
             })
-            if (type === "contact") {
-                await getData("contacts", "contact");
-            } else if (type === "address") {
-                await getData("addresses", "address");
-            } else if (type === "note") {
-                await getData("notes", "note");
-            }
         }
+        return () => {
+            unmounted = true
+        };
     }, [isEditable, userId]);
 
     const getData = (type, fieldName) => {
@@ -79,14 +90,13 @@ const CustomerAddEdit = () => {
                 },
                 [fieldName]: data[fieldName],
                 "id": data.id,
+                "created_by": data.createdBy,
                 "modified_by": data.modifiedBy,
                 "modified_date": data.modifiedAt
             }));
             setUserState((prevState) => ({
                     ...prevState,
-                    [type]: dataArr,
-                    modified_by: dataArr[0]?.modified_by,
-                    modified_date: dataArr[0]?.modified_date,
+                    [type]: dataArr
                 }
             ));
             setIsFetchingData(false);
@@ -101,8 +111,12 @@ const CustomerAddEdit = () => {
                 "id": userState.id
             },
             "id": "",
+            "created_by": '',
+            "modified_by": '',
+            "modified_date": '',
             [type]: ""
         }];
+        console.log(alldata);
         setUserState((prevState) => (
             {
                 ...prevState,
@@ -317,20 +331,28 @@ const CustomerAddEdit = () => {
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
                                         </div>
-
                                     </div>
-
                                 ))
                                 : ''}
                         </div>
+                        {userState.contacts && userState.contacts[0]?.modified_by &&
+                        <p className="note note-primary mb-0">
+                            Sonuncu
+                            dəyişiklik <strong>{userState.contacts[0].modified_by}</strong> tərəfindən <strong>{formattedDate(userState.contacts[0].modified_date)}</strong> tarixdə
+                            edilib.
+                        </p>}
                     </Card.Body>
                     <Card.Footer>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div className="text-info">Sonuncu dəyişiklik {userState.modified_by} tərəfindən {formattedDate(userState.modified_date)} tarixdə edilib.</div>
+                        <div className="d-flex justify-content-between align-items-center flex-wrap">
+                            <Link to="/"
+                                  className="btn btn-info"> <i className="fas fa-angle-double-left ms-1"/> Əsas
+                                səhifəyə
+                                qayıt
+                            </Link>
                             <div>
                                 <Button type="button"
                                         variant="success"
-                                        className="mt-2 mr-2"
+                                        className="mr-2"
                                         onClick={addNewInput.bind(this, "contacts", "contact")}
                                 >
                                     Yeni əlaqə növü əlavə edin
@@ -338,7 +360,6 @@ const CustomerAddEdit = () => {
                                 <Button type="submit"
                                         variant="primary"
                                         disabled={isLoading}
-                                        className="mt-2"
                                 >
                                     {isLoading ? 'Gözləyin…' : 'Əlavə et'}
                                 </Button>
@@ -368,7 +389,7 @@ const CustomerAddEdit = () => {
                                                        required
                                                        onChange={handleChange.bind(this, i, userState.id, "addresses", "address", addressInfo.id)}/>
                                             </div>
-                                            <span className="ml-2 text-danger"
+                                            <span className="ml-2 text-danger delete-button"
                                                   onClick={deleteHandle.bind(this, i, "addresses", addressInfo.id)}>
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
@@ -378,10 +399,21 @@ const CustomerAddEdit = () => {
                                 ))
                                 : ''}
                         </div>
+                        {userState.addresses && userState.addresses[0]?.modified_by &&
+                        <p className="note note-primary mb-0">
+                            Sonuncu
+                            dəyişiklik <strong>{userState.addresses[0] && userState.addresses[0]?.modified_by}</strong> tərəfindən <strong>{formattedDate(userState.addresses[0].modified_date)}</strong> tarixdə
+                            edilib.
+                        </p>
+                        }
                     </Card.Body>
                     <Card.Footer>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div className="text-info">Sonuncu dəyişiklik {userState.modified_by} tərəfindən {formattedDate(userState.modified_date)} tarixdə edilib.</div>
+                        <div className="d-flex justify-content-between align-items-center flex-wrap">
+                            <Link to="/"
+                                  className="btn btn-info"> <i className="fas fa-angle-double-left ms-1"/> Əsas
+                                səhifəyə
+                                qayıt
+                            </Link>
                             <div>
                                 <Button type="button"
                                         variant="success"
@@ -422,7 +454,7 @@ const CustomerAddEdit = () => {
                                                        required
                                                        onChange={handleChange.bind(this, i, userState.id, "notes", "note", noteInfo.id)}/>
                                             </div>
-                                            <span className="ml-2 text-danger"
+                                            <span className="ml-2 text-danger delete-button"
                                                   onClick={deleteHandle.bind(this, i, "notes", noteInfo.id)}>
                                                 <i className="fas fa-trash-alt fa-sm"/>
                                             </span>
@@ -432,23 +464,35 @@ const CustomerAddEdit = () => {
                                 ))
                                 : ''}
                         </div>
+                        {userState.notes && userState.notes[0]?.modified_by &&
+                        <p className="note note-primary mb-0">
+                            Sonuncu
+                            dəyişiklik <strong>{userState.notes[0] && userState.notes[0].modified_by}</strong> tərəfindən <strong>{formattedDate(userState.notes[0] && userState.notes[0].modified_date)}</strong> tarixdə
+                            edilib.
+                        </p>
+                        }
                     </Card.Body>
                     <Card.Footer>
-                        <div className="d-flex justify-content-end">
-                            <Button type="button"
-                                    variant="success"
-                                    className="mt-2 mr-2"
-                                    onClick={addNewInput.bind(this, "notes", "note")}
-                            >
-                                Yeni ünvan əlavə edin
-                            </Button>
-                            <Button type="submit"
-                                    variant="primary"
-                                    disabled={isLoading}
-                                    className="mt-2"
-                            >
-                                {isLoading ? 'Gözləyin…' : 'Əlavə et'}
-                            </Button>
+                        <div className="d-flex justify-content-between align-items-center flex-wrap">
+                            <Link to="/"
+                                  className="btn btn-info"> <i className="fas fa-angle-double-left ms-1"/> Əsas səhifəyə qayıt
+                            </Link>
+                            <div>
+                                <Button type="button"
+                                        variant="success"
+                                        className="mt-2 mr-2"
+                                        onClick={addNewInput.bind(this, "notes", "note")}
+                                >
+                                    Yeni ünvan əlavə edin
+                                </Button>
+                                <Button type="submit"
+                                        variant="primary"
+                                        disabled={isLoading}
+                                        className="mt-2"
+                                >
+                                    {isLoading ? 'Gözləyin…' : 'Əlavə et'}
+                                </Button>
+                            </div>
                         </div>
                     </Card.Footer>
                 </form>
