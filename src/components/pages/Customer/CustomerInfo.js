@@ -3,6 +3,7 @@ import {Link, useParams, useHistory} from 'react-router-dom';
 import {get, remove} from "../../api/Api";
 import {Card} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+import AddPurchase from "../Purchase/AddPurchase";
 
 const CustomerInfo = () => {
 
@@ -32,7 +33,8 @@ const CustomerInfo = () => {
                 surname: res.surname,
                 contacts: res.contacts,
                 addresses: res.addresses,
-                notes: res.notes
+                notes: res.notes,
+                id: res.id
             }))
         }).catch((err) => {
             console.log(err);
@@ -62,16 +64,19 @@ const CustomerInfo = () => {
         <React.Fragment>
             <Card>
                 <Card.Header>
-                    <div className="d-flex justify-content-between align-items-center">
-                        <h4 className="mb-0">{state.name} {state.surname}</h4>
-                        {!state.contacts.length && !state.notes.length && !state.addresses.length &&
+                    <div className="row">
+                        <div className="col-md-6">
+                            <h4 className="mb-0">{state.name} {state.surname}</h4>
+                            {!state.contacts.length && !state.notes.length && !state.addresses.length &&
                             < button type="button" onClick={userDeleteHandler.bind(this, userID)}
-                                      className="btn btn-danger btn-floating">
+                                     className="btn btn-danger btn-floating">
                                 <i className="fas fa-trash-alt"/>
                             </button>
-                        }
+                            }
+                        </div>
                     </div>
                 </Card.Header>
+                <AddPurchase/>
                 <Card.Body>
                     <div className="row">
                         <div className="col-md-12 mb-3">

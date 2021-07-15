@@ -116,7 +116,6 @@ const CustomerAddEdit = () => {
             "modified_date": '',
             [type]: ""
         }];
-        console.log(alldata);
         setUserState((prevState) => (
             {
                 ...prevState,

@@ -1,4 +1,4 @@
-import {useContext, useState, useEffect, createContext} from 'react';
+import {useState, useEffect, createContext} from 'react';
 import {get} from './components/api/Api';
 import PrivateRoute from "./components/helpers/PrivateRoute";
 import Home from './components/pages/Home';
@@ -8,7 +8,6 @@ import {
     Route
 } from "react-router-dom";
 import Layout from "./components/layout/layout";
-import AuthContext from "./components/store/auth-context";
 
 import PaymentType from './components/pages/PaymentType/PaymentType';
 import PaymentAddEdit from './components/pages/PaymentType/PaymentAddEdit';
@@ -22,6 +21,9 @@ import StatusAddEdit from './components/pages/StatusType/StatusAddEdit';
 import Customers from './components/pages/Customer/Customers';
 import CustomerInfo from './components/pages/Customer/CustomerInfo';
 import CustomerAddEdit from './components/pages/Customer/CustomerAddEdit';
+
+import AddPurchase from './components/pages/Purchase/AddPurchase';
+import PurchaseInfo from "./components/pages/Purchase/PurchaseInfo";
 
 
 export const IsAuth = createContext(null);
@@ -62,6 +64,8 @@ function App() {
                         <PrivateRoute path='/customers' component={Customers}/>
                         <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
                         <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
+                        <PrivateRoute path='/addPurchase/:customerID' component={AddPurchase}/>
+                        <PrivateRoute path='/purchaseInfo' component={PurchaseInfo}/>
                     </Switch>
                 </Layout>
             </UserInfo.Provider>
