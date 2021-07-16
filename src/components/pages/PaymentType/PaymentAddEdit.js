@@ -11,6 +11,7 @@ const PaymentAddEdit = () => {
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
+    const [buttonName, setButtonName] = useState('Əlavə et');
 
     const isEditable = query.get("edit");
     const paymentId = query.get("id");
@@ -18,6 +19,7 @@ const PaymentAddEdit = () => {
     useEffect(() => {
         if (isEditable) {
             setIsFetchingData(true);
+            setButtonName('Düzəliş edin')
             get(`payment-types/${paymentId}`).then((res) => {
                 setIsFetchingData(false);
                 setName(res.name)
@@ -83,7 +85,7 @@ const PaymentAddEdit = () => {
                                 disabled={isLoading}
                                 className="mt-2"
                         >
-                            {isLoading ? 'Gözləyin…' : 'Əlavə et'}
+                            {isLoading ? 'Gözləyin…' : buttonName}
                         </Button>
                     </form>
                 </div>

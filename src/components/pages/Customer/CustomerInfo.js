@@ -6,7 +6,6 @@ import Loader from "react-loader-spinner";
 import AddPurchase from "../Purchase/AddPurchase";
 
 const CustomerInfo = () => {
-
     const history = useHistory();
 
     const params = useParams();
@@ -18,10 +17,13 @@ const CustomerInfo = () => {
         contacts: [],
         addresses: [],
         notes: []
-    })
+    });
+
+    const [purchases, setPurchases] = useState([]);
 
     useEffect(() => {
-        getUserInfo(userID)
+        getUserInfo(userID);
+        getCustomerPurchases(userID)
     }, []);
 
     const getUserInfo = (userID) => {
@@ -36,6 +38,23 @@ const CustomerInfo = () => {
                 notes: res.notes,
                 id: res.id
             }))
+        }).catch((err) => {
+            console.log(err);
+            setIsFetchingData(false);
+        })
+    }
+
+    const getCustomerPurchases = (userID) => {
+        setIsFetchingData(true);
+        get(`/purchases/search?customerId.equals=${userID}&page=0&size=20`).then((res) => {
+            res.content?.map(purchaseInfo => {
+                console.log(purchaseInfo.id)
+                get(`/purchase-items/search?purchaseId.equals=${purchaseInfo.id}&page=0&size=20`).then(res => {
+                    console.log(res)
+                }).catch(err => {
+                    console.log(err)
+                })
+            })
         }).catch((err) => {
             console.log(err);
             setIsFetchingData(false);
@@ -79,6 +98,17 @@ const CustomerInfo = () => {
                 <AddPurchase/>
                 <Card.Body>
                     <div className="row">
+                        <div className="col-md-12 mb-3">
+                            <ul className="list-group">
+                                <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
+                                    <div className="mb-0 font-family-Roboto-Medium">Sifarişlər</div>
+                                    <Link to={`/customer/add?edit=true&id=${userID}&type=contact`} type="button"
+                                          className="btn btn-success btn-floating">
+                                        <i className="fas fa-pen"/>
+                                    </Link>
+                                </li>
+                            </ul>
+                        </div>
                         <div className="col-md-12 mb-3">
                             <ul className="list-group">
                                 <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
