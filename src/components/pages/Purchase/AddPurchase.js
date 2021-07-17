@@ -14,6 +14,7 @@ const AddPurchase = () => {
     const [socialTypeList, setSocialTypeList] = useState([]);
     const [selectedValue, setSelectedValue] = useState('');
     const [isFetchingData, setIsFetchingData] = useState(true);
+    const [isDisabled, setIsDisabled] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
@@ -30,6 +31,7 @@ const AddPurchase = () => {
 
     const handleSelectChange = (event) => {
         setSelectedValue(event.value);
+        setIsDisabled(false)
     }
 
     const handlePurchaseForm = (event) => {
@@ -81,7 +83,7 @@ const AddPurchase = () => {
                                 <Button
                                     type="submit"
                                     variant="success"
-                                    disabled={isLoading}
+                                    disabled={isLoading || isDisabled}
                                     className="ml-2"
                                 >{isLoading ? 'Gözləyin…' : 'Əlavə et'}</Button>
                             </div>

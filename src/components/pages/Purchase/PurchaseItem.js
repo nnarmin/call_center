@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {useHistory} from 'react-router-dom';
 import Select from "react-select";
 import {Button} from "react-bootstrap";
 import {selectStyles} from "../../helpers/selectStyles";
@@ -10,24 +9,30 @@ import Loader from "react-loader-spinner";
 
 const PurchaseItem = () => {
     const query = useQuery();
-    const history = useHistory();
-
-    const customer_id = query.get("id");
     const purchase_id = query.get("purchaseID");
+    const type = query.get("type");
+    const item_id = query.get("itemID");
+    const isEditable = query.get("edit");
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [paymentTypeList, setPaymentTypeList] = useState([]);
     const [purchaseItem, setPurchaseItem] = useState([
         {
             "purchase": {
+                "createdBy": '',
+                "createdAt": '',
+                "modifiedBy": '',
+                "modifiedAt": '',
                 "id": purchase_id
             },
             "item": "",
             "paymentType": {
-                "id": ''
+                "id": '',
+                'name': ''
             },
             "price": '',
-            "qty": ''
+            "qty": '',
+            'id': ''
         },
     ])
 
@@ -41,11 +46,14 @@ const PurchaseItem = () => {
         }).catch((err) => {
             setIsFetchingData(false);
         })
+        if(isEditable && type==='info'){
+            getData();
+        }
     }, []);
 
     const getData = () => {
-        get(`/purchase-items/search?purchaseId.equals=${purchase_id}&page=0&size=20`).then((res) => {
-            console.log(res);
+        get(`/purchase-items/${item_id}`).then((res) => {
+            setPurchaseItem([res]);
             setIsFetchingData(false);
         }).catch(() => {
             setIsFetchingData(false);
@@ -71,14 +79,15 @@ const PurchaseItem = () => {
 
     const handleInputChange = (i, type, value) => {
         let alldata = [...purchaseItem];
-        if(type==='select_purchase_type'){
+        if (type === 'select_purchase_type') {
             alldata[i] = {
                 ...alldata[i],
                 paymentType: {
-                    id: value.value
+                    id: value.value,
+                    name: value.label
                 }
             }
-        }else{
+        } else {
             alldata[i] = {
                 ...alldata[i],
                 [type]: value
@@ -87,12 +96,15 @@ const PurchaseItem = () => {
         setPurchaseItem(alldata);
     }
 
-    const handlePurchaseItemForm = (event) => {
+    const deletePurchaseItemHandler = () => {
+
+    }
+
+    const onUpdateHandler = (index, event) => {
         event.preventDefault();
         setIsLoading(true);
-        post('/purchase-items/batch', purchaseItem).then((res) => {
+        post('/purchase-items', purchaseItem[index]).then((res) => {
             setIsLoading(false);
-            history.push(`/customerInfo/${customer_id}`);
         }).catch(err => {
             setIsLoading(false);
         })
@@ -111,42 +123,59 @@ const PurchaseItem = () => {
     }
 
     return (
-        <form onSubmit={handlePurchaseItemForm}>
-            {purchaseItem.length && purchaseItem.map((item, i) => (
-                <div className="row mb-3" key={i}>
-                    <div className="col-lg-4">
-                        <label>Məhsulun adı</label>
-                        <input type="text" className="form-control"
-                               onChange={(e) => handleInputChange(i, 'item', e.target.value)} value={item.item}
-                               required/>
-                    </div>
-                    <div className="col-lg-4">
-                        <label>Ödəniş növü</label>
-                        <Select
-                            styles={selectStyles}
-                            options={paymentTypeList}
-                            components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
-                            onChange={value => handleInputChange(i, "select_purchase_type", value)}
-                            placeholder='Ödəniş növünü seçin...'
-                        />
-                    </div>
-                    <div className="col-lg-2">
-                        <label>Sayı</label>
-                        <input type="number" className="form-control"
-                               min="1" max="20"
-                               value={item.qty}
-                               onChange={(e) => handleInputChange(i, 'qty', e.target.value)}
-                               required/>
-                    </div>
-                    <div className="col-lg-2">
-                        <label>Qiyməti</label>
-                        <input type="text" className="form-control"
-                               value={item.price}
-                               onChange={(e) => handleInputChange(i, 'price', e.target.value)}
-                               required/>
-                    </div>
-                </div>
-            ))}
+        <div>
+            <ul className="list-group">
+                {purchaseItem.length && purchaseItem.map((item, i) => (
+                    <li className="list-group-item" key={i}>
+                        <div className="row">
+                            <div className="col-lg-4">
+                                <label className="mb-0 small ">Məhsulun adı</label>
+                                <input type="text" className="form-control"
+                                       onChange={(e) => handleInputChange(i, 'item', e.target.value)} value={item.item}
+                                       required/>
+                            </div>
+                            <div className="col-lg-3">
+                                <label className="mb-0 small ">Ödəniş növü</label>
+                                <Select
+                                    styles={selectStyles}
+                                    options={paymentTypeList}
+                                    value ={item?.paymentType ? [{ value: item?.paymentType?.id, label: item?.paymentType?.name }] : ''}
+                                    components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növsü tapılmadı')}
+                                    onChange={value => handleInputChange(i, "select_purchase_type", value)}
+                                    placeholder='Ödəniş növünü seçin...'
+                                />
+                            </div>
+                            <div className="col-lg-2">
+                                <label className="mb-0 small ">Sayı</label>
+                                <input type="number" className="form-control"
+                                       min="1" max="20"
+                                       value={item.qty}
+                                       onChange={(e) => handleInputChange(i, 'qty', e.target.value)}
+                                       required/>
+                                <small className="form-text text-muted">Boş qoyula bilər</small>
+                            </div>
+                            <div className="col-lg-2">
+                                <label className="mb-0 small ">Qiyməti</label>
+                                <input type="text" className="form-control"
+                                       value={item.price}
+                                       onChange={(e) => handleInputChange(i, 'price', e.target.value)}
+                                       required/>
+                                <small className="small text-muted">Boş qoyula bilər</small>
+                            </div>
+                            <div className="col-lg-1 d-flex align-items-center">
+                                    <span className="mr-3 text-danger delete-button"
+                                          onClick={deletePurchaseItemHandler}>
+                                            <i className="fas fa-trash-alt fa-sm"/>
+                                    </span>
+                                    <span data-toggle="tooltip" title={!isEditable ? 'Əlavə et' : 'Düzəlişi təsdiqlə'}
+                                        onClick={onUpdateHandler.bind(this, i)}>
+                                        <i className="fas fa-check-circle text-success ml-2"/>
+                                    </span>
+                            </div>
+                        </div>
+                    </li>
+                ))}
+            </ul>
             <div className="d-flex justify-content-end align-items-center mt-3">
                 <Button type="button"
                         variant="success"
@@ -155,12 +184,8 @@ const PurchaseItem = () => {
                 >
                     Yeni sifariş əlavə edin
                 </Button>
-                <Button type="submit"
-                        variant="primary"
-                        disabled={isLoading}
-                >{isLoading ? 'Gözləyin…' : 'Əlavə et'}</Button>
             </div>
-        </form>
+        </div>
     )
 }
 

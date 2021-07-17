@@ -4,8 +4,6 @@ import {useQuery} from "../../hooks/useQuery";
 import {get, remove} from '../../api/Api';
 import {Table} from "react-bootstrap";
 import Loader from "react-loader-spinner";
-import PaginationComponent from "../../others/pagination";
-
 
 const PaymentList = (props) => {
     const history = useHistory();
