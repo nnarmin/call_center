@@ -6,6 +6,7 @@ import {get, post} from "../../api/Api";
 import {useQuery} from "../../hooks/useQuery";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import Loader from "react-loader-spinner";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const PurchaseItem = () => {
     const query = useQuery();
@@ -172,6 +173,13 @@ const PurchaseItem = () => {
                                         <i className="fas fa-check-circle text-success ml-2"/>
                                     </span>
                             </div>
+                            {item.purchase.modifiedBy &&
+                                <div className="col-12">
+                                    <span className="note note-info mb-0 mt-1 note-custom-style">
+                                        Sonuncu düzəliş <strong>{item.purchase.modifiedBy}</strong> tərəfindən <strong>{formattedDate(item.purchase.modifiedAt)}</strong> edilib.
+                                    </span>
+                                </div>
+                            }
                         </div>
                     </li>
                 ))}

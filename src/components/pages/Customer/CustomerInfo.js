@@ -3,10 +3,8 @@ import {Link, useParams, useHistory} from 'react-router-dom';
 import {get, remove} from "../../api/Api";
 import {Card} from "react-bootstrap";
 import Loader from "react-loader-spinner";
-import AddPurchase from "../Purchase/AddPurchase";
-import PurchaseItem from "../Purchase/PurchaseItem";
-import PurchaseNote from "../Purchase/PurchaseNote";
 import PurchaseList from "../Purchase/purchaseList";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const CustomerInfo = () => {
     const history = useHistory();
@@ -38,7 +36,8 @@ const CustomerInfo = () => {
                 addresses: res.addresses,
                 notes: res.notes,
                 id: res.id
-            }))
+            }));
+            console.log(state);
         }).catch((err) => {
             setIsFetchingData(false);
         })
@@ -47,6 +46,22 @@ const CustomerInfo = () => {
     const userDeleteHandler = (userID) => {
         remove(`customers/${userID}`).then((res) => {
             history.push('/customers');
+        })
+    }
+
+    const deleteHandle = (key, type, id) => {
+        let data = [...state[type]];
+        data.splice(key, 1);
+        setState((prevState) => (
+            {
+                ...prevState,
+                [type]: data
+            }
+        ));
+        remove(`customer-${type}/${id}`).then(res => {
+            setIsFetchingData(false);
+        }).catch(err => {
+            setIsFetchingData(false);
         })
     }
 
@@ -69,6 +84,8 @@ const CustomerInfo = () => {
                     <div className="row">
                         <div className="col-md-6">
                             <h4 className="mb-0">{state.name} {state.surname}</h4>
+                        </div>
+                        <div className="col-md-6 text-right">
                             {!state.contacts.length && !state.notes.length && !state.addresses.length &&
                             < button type="button" onClick={userDeleteHandler.bind(this, userID)}
                                      className="btn btn-danger btn-floating">
@@ -135,13 +152,32 @@ const CustomerInfo = () => {
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                             <div className="mb-0 font-family-Roboto-Medium">Əlaqə məlumatları</div>
-                                            <Link to={`/customer/add?edit=true&id=${userID}&type=contact`} type="button"
-                                                  className="btn btn-success btn-floating">
-                                                <i className="fas fa-pen"/>
+                                            <Link to={`/customer/add?type=contact&id=${userID}`}
+                                                  type="button"
+                                                  className="btn btn-primary">
+                                                Yeni Əlaqə
                                             </Link>
                                         </li>
-                                        {state.contacts && state.contacts.map(({contact}, i) => (
-                                            <li className="list-group-item" key={i}>{contact}</li>
+                                        {state.contacts && state.contacts.map(({contact, modifiedBy, modifiedAt, id}, i) => (
+                                            <li className="list-group-item" key={i}>
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span>{contact}</span>
+                                                    </div>
+                                                    <div>
+                                                        <Link
+                                                            className='mr-3 btn-xs'
+                                                            to={`/customer/add?edit=true&id=${userID}&type=contact&itemID=${id}`}
+                                                        >
+                                                            <i className='fas fa-edit fa-sm text-success'/>
+                                                        </Link>
+                                                        <span className='ml-2 btn-xs delete-button'
+                                                            onClick={deleteHandle.bind(this, i, "contacts", id)}>
+                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </li>
                                         ))}
                                     </ul>
                                 </div>
@@ -152,14 +188,35 @@ const CustomerInfo = () => {
                                 <div className="col-md-12">
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
-                                            <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                            <Link to={`/customer/add?edit=true&id=${userID}&type=note`} type="button"
-                                                  className="btn btn-success btn-floating">
-                                                <i className="fas fa-pen"/>
+                                            <div className="mb-0 font-family-Roboto-Medium">Ünvan məlumatları</div>
+                                            <Link to={`/customer/add?type=address&id=${userID}`}
+                                                  type="button"
+                                                  className="btn btn-primary">
+                                                Yeni Ünvan
                                             </Link>
                                         </li>
-                                        {state.notes && state.notes.map(({note}, i) => (
-                                            <li className="list-group-item" key={i}>{note}</li>
+                                        {state.addresses && state.addresses.map(({address, id, modifiedBy, modifiedAt}, i) => (
+                                            <li className="list-group-item" key={i}>
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <span>{address} - </span>
+                                                        <span className="note note-info mb-0 mt-1 note-custom-style">
+                                                            Sonuncu düzəliş <strong>{modifiedBy}</strong> tərəfindən <strong>{formattedDate(modifiedAt)}</strong> edilib.
+                                                        </span>
+                                                    </div>
+                                                    <div>
+                                                        <Link
+                                                            className='mr-3 btn-xs'
+                                                            to={`/customer/add?edit=true&id=${userID}&type=address&itemID=${id}`}>
+                                                            <i className='fas fa-edit fa-sm text-success'/>
+                                                        </Link>
+                                                        <span className='ml-2 btn-xs delete-button'
+                                                              onClick={deleteHandle.bind(this, i, "addresses", id)}>
+                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </li>
                                         ))}
                                     </ul>
                                 </div>
@@ -171,78 +228,35 @@ const CustomerInfo = () => {
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                             <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                            <Link to={`/customer/add?edit=true&id=${userID}&type=note`} type="button"
-                                                  className="btn btn-success btn-floating">
-                                                <i className="fas fa-pen"/>
+                                            <Link to={`/customer/add?type=note&id=${userID}`} type="button"
+                                                  className="btn btn-primary">
+                                                Yeni Qeyd
                                             </Link>
                                         </li>
-                                        {state.notes && state.notes.map(({note}, i) => (
-                                            <li className="list-group-item" key={i}>{note}</li>
+                                        {state.notes && state.notes.map(({note, id}, i) => (
+                                            <li className="list-group-item" key={i}>
+                                                <div className="d-flex align-items-center justify-content-between">
+                                                    <span>{note}</span>
+                                                    <div>
+                                                        <Link
+                                                            className='mr-3 btn-xs'
+                                                            to={`/customer/add?edit=true&id=${userID}&type=note&itemID=${id}`}
+                                                        >
+                                                            <i className='fas fa-edit fa-sm text-success'/>
+                                                        </Link>
+                                                        <span className='ml-2 btn-xs delete-button'
+                                                              onClick={deleteHandle.bind(this, i, "notes", id)}>
+                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </li>
                                         ))}
                                     </ul>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    {/*<div className="row">
-                        <div className="col-md-12 mb-3">
-                            <ul className="list-group">
-                                <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
-                                    <div className="mb-0 font-family-Roboto-Medium">Sifarişlər</div>
-                                    <Link to={`/customer/add?edit=true&id=${userID}&type=contact`} type="button"
-                                          className="btn btn-success btn-floating">
-                                        <i className="fas fa-pen"/>
-                                    </Link>
-                                </li>
-                                {purchases.length && purchases.map((purchase, i) => (
-                                    <li className="list-group-item" key={i}>{purchase.item}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="col-md-12 mb-3">
-                            <ul className="list-group">
-                                <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
-                                    <div className="mb-0 font-family-Roboto-Medium">Əlaqə məlumatları</div>
-                                    <Link to={`/customer/add?edit=true&id=${userID}&type=contact`} type="button"
-                                          className="btn btn-success btn-floating">
-                                        <i className="fas fa-pen"/>
-                                    </Link>
-                                </li>
-                                {state.contacts && state.contacts.map(({contact}, i) => (
-                                    <li className="list-group-item" key={i}>{contact}</li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="col-md-12 mb-3">
-                            <ul className="list-group">
-                                <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
-                                    <div className="mb-0 font-family-Roboto-Medium">Ünvan məlumatları</div>
-                                    <Link to={`/customer/add?edit=true&id=${userID}&type=address`} type="button"
-                                          className="btn btn-success btn-floating">
-                                        <i className="fas fa-pen"/>
-                                    </Link>
-                                </li>
-                                {state.addresses && state.addresses.map(({address}, i) => (
-                                    <li className="list-group-item" key={i}>{address}</li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="col-md-12 mb-3">
-                            <ul className="list-group">
-                                <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
-                                    <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                    <Link to={`/customer/add?edit=true&id=${userID}&type=note`} type="button"
-                                          className="btn btn-success btn-floating">
-                                        <i className="fas fa-pen"/>
-                                    </Link>
-                                </li>
-                                {state.notes && state.notes.map(({note}, i) => (
-                                    <li className="list-group-item" key={i}>{note}</li>
-                                ))}
-                            </ul>
-                        </div>
-                    </div>*/}
                 </Card.Body>
             </Card>
         </React.Fragment>

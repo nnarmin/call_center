@@ -10,25 +10,45 @@ const PurchaseList = () => {
     const userID = params.customerID;
 
     const [isFetchingPurchases, setIsFetchingPurchases] = useState(true)
-    const [purchases, setPurchases] = useState({});
+    const [purchases, setPurchases] = useState([]);
     const [isFetchingData, setIsFetchingData] = useState(true);
 
     useEffect(() => {
-        getCustomerPurchases(userID);
-    }, []);
+        setIsFetchingData(true)
+        get(`/purchases/search?customerId.equals=${userID}&page=0&size=40`).then((res) => {
+            res.content?.map(purchaseInfo => {
+                get(`/purchase-items/search?purchaseId.equals=${purchaseInfo.id}&page=0&size=20`).then(result => {
+                    if (result.content && result.content.length) {
+                        setPurchases(prevState => (
+                            [...prevState, result.content]
+                        ));
+                    }
+                    setIsFetchingData(false);
+                }).catch(err => {
+                    setIsFetchingData(false);
+                })
+            })
+            setIsFetchingData(false);
+        }).catch((err) => {
+            setIsFetchingData(false);
+        })
+        // getCustomerPurchases(userID);
+    }, [userID]);
 
     const getCustomerPurchases = (userID) => {
         setIsFetchingData(true)
-        get(`/purchases/search?customerId.equals=${userID}&page=0&size=20`).then((res) => {
+        get(`/purchases/search?customerId.equals=${userID}&page=0&size=40`).then((res) => {
             const purchaseArr = [];
             res.content?.map(purchaseInfo => {
+                setIsFetchingPurchases(true);
                 get(`/purchase-items/search?purchaseId.equals=${purchaseInfo.id}&page=0&size=20`).then(result => {
-                    setIsFetchingPurchases(true);
+                    setIsFetchingData(true);
                     if (result.content && result.content.length) {
                         purchaseArr.push(result.content)
                         setIsFetchingPurchases(false);
                     }
                     setPurchases(purchaseArr);
+                    setIsFetchingData(false);
                 }).catch(err => {
                     setIsFetchingPurchases(false);
                 })
@@ -43,7 +63,7 @@ const PurchaseList = () => {
         setIsFetchingData(true)
         remove(`/purchase-items/${id}`).then((res) => {
             getCustomerPurchases(userID);
-        }).catch((error)=>{
+        }).catch((error) => {
             setIsFetchingData(false)
         })
     };
@@ -71,8 +91,8 @@ const PurchaseList = () => {
             </li>
             {purchases.length && purchases.map((purchase, i) => (
                 <li className="list-group-item" key={i}>
-                    <div className="d-flex">
-                        <strong className="width-25 mr-2">#{i}</strong>
+                    <div>
+                        <div className="mb-2"><strong>{formattedDate(purchase[0].purchase.createdAt)}</strong> tarixində <strong>{purchase[0].purchase.createdBy}</strong> tərəfindən verilən sifariş</div>
                         <div className="flex-1">
                             <table className="table table-bordered mb-0">
                                 <tbody>
@@ -81,9 +101,6 @@ const PurchaseList = () => {
                                         <td className="table-index width-25">{k}</td>
                                         <td>
                                             <span className="mr-2">Sifariş - <strong>{info.item}</strong></span>
-                                            <span className="note note-info mb-0 mt-1 note-custom-style">
-                                                Sonuncu düzəliş <strong>{info.purchase.modifiedBy}</strong> tərəfindən <strong>{formattedDate(info.purchase.modifiedAt)}</strong> edilib.
-                                            </span>
                                         </td>
                                         <td className="table-actions text-right">
                                             <Link

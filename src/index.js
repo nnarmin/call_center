@@ -21,9 +21,7 @@ ReactDOM.render(
     <Router>
         <ReactNotification/>
         <AuthContextProvider>
-            <React.StrictMode>
-                <App/>
-            </React.StrictMode>
+            <App/>
         </AuthContextProvider>
     </Router>,
     document.getElementById('root')

@@ -63,7 +63,7 @@ const SocialList = () => {
                 <thead>
                 <tr>
                     <th>#</th>
-                    <th>Sosial Şəbəkə Növü</th>
+                    <th>Status Növü</th>
                     <th></th>
                 </tr>
                 </thead>

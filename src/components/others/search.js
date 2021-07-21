@@ -112,7 +112,7 @@ const Search = (props) => {
                 }
                 {state.message}
                 {state.results?.content && state.results?.totalPages && <div className='row pt-2'>
-                    <div className='col-md-4'>
+                    <div className='col-md-6'>
                         <nav aria-label='Page navigation example p-0'>
                             <ul className='pagination mb-0'>
                                 <li className={`page-item ${state.results?.first ? 'disabled' : ''}`}>
@@ -136,15 +136,6 @@ const Search = (props) => {
                                 </li>
                             </ul>
                         </nav>
-                    </div>
-                    <div className='col-md-4'>
-                        <div className='text-muted text-center'>
-                        <span>
-                          Toplam məlumat:
-                            {' '}
-                            {state.results?.totalElements}
-                        </span>
-                        </div>
                     </div>
                 </div>
                 }

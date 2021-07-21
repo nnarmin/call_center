@@ -14,10 +14,19 @@ const PurchaseNote = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [purchaseItem, setPurchaseItem] = useState([
         {
+            "createdBy": '',
+            "createdAt": "",
+            "modifiedBy": "",
+            "modifiedAt": "",
+            "id": '',
             "purchase": {
+                "createdBy": '',
+                "createdAt": '',
+                "modifiedBy": '',
+                "modifiedAt": '',
                 "id": purchase_id
             },
-            "note": ''
+            "note": ""
         }
     ])
 
@@ -29,6 +38,7 @@ const PurchaseNote = () => {
 
     const getData = () => {
         get(`/purchase-notes/${item_id}`).then((res) => {
+            console.log(res);
             setPurchaseItem([res]);
             setIsFetchingData(false);
         }).catch(() => {
@@ -64,11 +74,16 @@ const PurchaseNote = () => {
     const onUpdateHandler = (index, event) => {
         event.preventDefault();
         setIsLoading(true);
-        post('/purchase-notes', purchaseItem[index]).then((res) => {
-            setIsLoading(false);
-        }).catch(err => {
-            setIsLoading(false);
-        })
+        if(isEditable){
+
+        }else{
+            post('/purchase-notes', purchaseItem[index]).then((res) => {
+                setIsLoading(false);
+            }).catch(err => {
+                setIsLoading(false);
+            })
+        }
+
     }
 
     if (isFetchingData) {
