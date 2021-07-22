@@ -319,7 +319,7 @@ const CustomerAddEdit = () => {
                                                   onClick={deleteHandle.bind(this, i, "contacts", contactInfo.id)}>
                                                         <i className="fas fa-trash-alt fa-sm"/>
                                                     </span>
-                                            <div
+                                            <div className="cursor-pointer"
                                                 onClick={onUpdateHandler.bind(this, contactInfo.id, i, "contact")}>
                                                 <i className="fas fa-check-circle text-success ml-2"/>
                                             </div>
@@ -370,7 +370,7 @@ const CustomerAddEdit = () => {
                                                   onClick={deleteHandle.bind(this, i, "addresses", addressInfo.id)}>
                                                         <i className="fas fa-trash-alt fa-sm"/>
                                                     </span>
-                                            <div
+                                            <div className="cursor-pointer"
                                                 onClick={onUpdateHandler.bind(this, addressInfo.id, i, "address")}>
                                                 <i className="fas fa-check-circle text-success ml-2"/>
                                             </div>
@@ -421,7 +421,7 @@ const CustomerAddEdit = () => {
                                                   onClick={deleteHandle.bind(this, i, "notes", noteInfo.id)}>
                                                     <i className="fas fa-trash-alt fa-sm"/>
                                                 </span>
-                                            <div
+                                            <div className="cursor-pointer"
                                                 onClick={onUpdateHandler.bind(this, noteInfo.id, i, "note")}>
                                                 <i className="fas fa-check-circle text-success"/>
                                             </div>

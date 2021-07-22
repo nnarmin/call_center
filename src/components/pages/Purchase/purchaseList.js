@@ -2,67 +2,76 @@ import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
 import {get, remove} from "../../api/Api";
 import {formattedDate} from "../../helpers/formattedDate";
+import {
+    Tab, Tabs, TabList, TabPanel,
+} from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 import Loader from "react-loader-spinner";
 
 const PurchaseList = () => {
 
     const params = useParams();
     const userID = params.customerID;
+    const [isFetchingData, setIsFetchingData] = useState(false);
+    const [purchaseState, setPurchaseState] = useState([
+        {
+            createdBy: "",
+            createdAt: "",
+            modifiedBy: "",
+            modifiedAt: "",
+            id: '',
+            purchaseItem: [],
+            purchaseNote: [{
+                createdBy: "",
+                createdAt: "",
+                modifiedBy: "",
+                modifiedAt: "",
+                id: '',
+                note: ''
+            },],
+            purchaseStatus: ''
+        }
+    ]);
 
-    const [isFetchingPurchases, setIsFetchingPurchases] = useState(true)
-    const [purchases, setPurchases] = useState([]);
-    const [isFetchingData, setIsFetchingData] = useState(true);
 
-    useEffect(() => {
-        setIsFetchingData(true)
-        get(`/purchases/search?customerId.equals=${userID}&page=0&size=40`).then((res) => {
-            res.content?.map(purchaseInfo => {
-                get(`/purchase-items/search?purchaseId.equals=${purchaseInfo.id}&page=0&size=20`).then(result => {
-                    if (result.content && result.content.length) {
-                        setPurchases(prevState => (
-                            [...prevState, result.content]
-                        ));
-                    }
-                    setIsFetchingData(false);
-                }).catch(err => {
-                    setIsFetchingData(false);
-                })
-            })
-            setIsFetchingData(false);
-        }).catch((err) => {
-            setIsFetchingData(false);
-        })
-        // getCustomerPurchases(userID);
-    }, [userID]);
-
-    const getCustomerPurchases = (userID) => {
-        setIsFetchingData(true)
-        get(`/purchases/search?customerId.equals=${userID}&page=0&size=40`).then((res) => {
+    useEffect( () => {
+        setIsFetchingData(true);
+        get(`purchases/search?customerId.equals=${userID}&page=0&size=40`).then(res => {
             const purchaseArr = [];
-            res.content?.map(purchaseInfo => {
-                setIsFetchingPurchases(true);
-                get(`/purchase-items/search?purchaseId.equals=${purchaseInfo.id}&page=0&size=20`).then(result => {
-                    setIsFetchingData(true);
-                    if (result.content && result.content.length) {
-                        purchaseArr.push(result.content)
-                        setIsFetchingPurchases(false);
-                    }
-                    setPurchases(purchaseArr);
-                    setIsFetchingData(false);
-                }).catch(err => {
-                    setIsFetchingPurchases(false);
+            res.content.length && res.content.map(purchase => (
+                purchaseArr.push({
+                    createdBy: purchase.createdBy,
+                    createdAt: purchase.createdAt,
+                    modifiedAt: purchase.modifiedAt,
+                    modifiedBy: purchase.modifiedBy,
+                    id: purchase.id,
+                    purchaseItem: [],
+                    purchaseNote: [],
+                    purchaseStatus: []
                 })
+            ))
+            purchaseArr.length && purchaseArr.map((purchase, i) => {
+                get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=20`).then(res => {
+                    purchaseArr[i].purchaseNote.push(...res.content);
+                }).catch(err => {console.log(err);});
+                get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=20`).then(res => {
+                    purchaseArr[i].purchaseItem.push(...res.content);
+                }).catch(err => {console.log(err)})
+                get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=20`).then(res => {
+                    purchaseArr[i].purchaseStatus.push(...res.content);
+                }).catch(err => {console.log(err)})
             })
-            setIsFetchingData(false)
-        }).catch((err) => {
+            setPurchaseState(purchaseArr);
+            setIsFetchingData(false);
+            console.log(purchaseState);
+        }).catch(err => {
             setIsFetchingData(false);
         })
-    }
+    }, [userID]);
 
     const deleteHandle = (id) => {
         setIsFetchingData(true)
         remove(`/purchase-items/${id}`).then((res) => {
-            getCustomerPurchases(userID);
         }).catch((error) => {
             setIsFetchingData(false)
         })
@@ -89,40 +98,74 @@ const PurchaseList = () => {
                     Yeni Sifariş
                 </Link>
             </li>
-            {purchases.length && purchases.map((purchase, i) => (
+            {purchaseState && purchaseState.map((purchase, i) => (
                 <li className="list-group-item" key={i}>
                     <div>
-                        <div className="mb-2"><strong>{formattedDate(purchase[0].purchase.createdAt)}</strong> tarixində <strong>{purchase[0].purchase.createdBy}</strong> tərəfindən verilən sifariş</div>
+                        <div className="mb-2">
+                            <strong>{formattedDate(purchase.createdAt)}</strong> tarixində <strong>{purchase.createdBy}</strong> tərəfindən
+                            verilən sifariş
+                        </div>
                         <div className="flex-1">
-                            <table className="table table-bordered mb-0">
-                                <tbody>
-                                {purchase.length && purchase.map((info, k) => (
-                                    <tr key={k}>
-                                        <td className="table-index width-25">{k}</td>
-                                        <td>
-                                            <span className="mr-2">Sifariş - <strong>{info.item}</strong></span>
-                                        </td>
-                                        <td className="table-actions text-right">
-                                            <Link
-                                                className='mr-3 btn-xs'
-                                                to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${info.id}`}
-                                            >
-                                                <i className='fas fa-edit fa-sm text-success'/>
-                                            </Link>
-                                            <span className='ml-2 btn-xs delete-button'
-                                                  onClick={deleteHandle.bind(this, info.id)}>
-                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                ))}
-                                </tbody>
-                            </table>
+                            {console.log(purchase)
+                           /* <Tabs>
+                                <TabList>
+                                    <Tab>Sifarişlər</Tab>
+                                    <Tab>Qeydlər</Tab>
+                                    <Tab>Status</Tab>
+                                </TabList>
+                                <TabPanel>
+                                    <table className="table table-bordered table-hover mb-0">
+                                        <thead className="library-table-head">
+                                        <tr>
+                                            <th className="library-table-index" scope="col">#</th>
+                                            <th scope="col">Sifariş adı</th>
+                                            <th scope="col">Ödəniş növü</th>
+                                            <th scope="col">Qiymət</th>
+                                            <th scope="col">Say</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {purchase.purchaseItem.map((info, k) => (
+                                            console.log(info)
+                                            /!*<tr key={k}>
+                                                <td className="table-index width-25">{k}</td>
+                                                <td className="d-flex justify-content-between">
+                                                    <span>{info.item}</span>
+                                                </td>
+                                                <td>{info.paymentType.name}</td>
+                                                <td>{info.price}</td>
+                                                <td>{info.qty}</td>
+                                                <td className="table-actions text-right">
+                                                    <Link
+                                                        className='mr-3 btn-xs'
+                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${info.id}`}
+                                                    >
+                                                        <i className='fas fa-edit fa-sm text-success'/>
+                                                    </Link>
+                                                    <span className='ml-2 btn-xs delete-button'
+                                                          onClick={deleteHandle.bind(this, info.id)}>
+                                                        <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                    </span>
+                                                </td>
+                                            </tr>*!/
+                                        ))}
+                                        </tbody>
+                                    </table>
+                                </TabPanel>
+                                <TabPanel>
+
+                                </TabPanel>
+                                <TabPanel>
+
+                                </TabPanel>
+                            </Tabs>*/
+                            }
                         </div>
                     </div>
                 </li>
             ))}
-            {!purchases.length && <p className="mt-2 text-center">Heç bir sifariş əlavə edilməyib.</p>}
+            <li className="list-group-item text-center">Heç bir sifariş əlavə edilməyib.</li>
         </ul>
     )
 }

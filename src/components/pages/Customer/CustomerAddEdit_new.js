@@ -51,7 +51,6 @@ const CustomerAddEdit = () => {
             "modified_date": ''
         }],
         id: '',
-
     })
 
     useEffect(() => {

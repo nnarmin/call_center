@@ -179,6 +179,7 @@ const CustomerInfo = () => {
                                                 </div>
                                             </li>
                                         ))}
+                                        {!state.contacts.length && <li className="list-group-item text-center">Heç bir əlaqə vasitəsi daxil edilməyib.</li>}
                                     </ul>
                                 </div>
                             </div>
@@ -198,12 +199,7 @@ const CustomerInfo = () => {
                                         {state.addresses && state.addresses.map(({address, id, modifiedBy, modifiedAt}, i) => (
                                             <li className="list-group-item" key={i}>
                                                 <div className="d-flex align-items-center justify-content-between">
-                                                    <div>
-                                                        <span>{address} - </span>
-                                                        <span className="note note-info mb-0 mt-1 note-custom-style">
-                                                            Sonuncu düzəliş <strong>{modifiedBy}</strong> tərəfindən <strong>{formattedDate(modifiedAt)}</strong> edilib.
-                                                        </span>
-                                                    </div>
+                                                    <span>{address}</span>
                                                     <div>
                                                         <Link
                                                             className='mr-3 btn-xs'
@@ -218,6 +214,7 @@ const CustomerInfo = () => {
                                                 </div>
                                             </li>
                                         ))}
+                                        {!state.addresses.length && <li className="list-group-item text-center">Heç bir ünvan məlumatı daxil edilməyib.</li>}
                                     </ul>
                                 </div>
                             </div>
@@ -252,6 +249,7 @@ const CustomerInfo = () => {
                                                 </div>
                                             </li>
                                         ))}
+                                        {!state.notes.length && <li className="list-group-item text-center">Heç bir qeyd daxil edilməyib.</li>}
                                     </ul>
                                 </div>
                             </div>

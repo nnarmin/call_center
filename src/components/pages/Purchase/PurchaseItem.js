@@ -168,7 +168,7 @@ const PurchaseItem = () => {
                                           onClick={deletePurchaseItemHandler}>
                                             <i className="fas fa-trash-alt fa-sm"/>
                                     </span>
-                                    <span data-toggle="tooltip" title={!isEditable ? 'Əlavə et' : 'Düzəlişi təsdiqlə'}
+                                    <span  className="cursor-pointer" data-toggle="tooltip" title={!isEditable ? 'Əlavə et' : 'Düzəlişi təsdiqlə'}
                                         onClick={onUpdateHandler.bind(this, i)}>
                                         <i className="fas fa-check-circle text-success ml-2"/>
                                     </span>
