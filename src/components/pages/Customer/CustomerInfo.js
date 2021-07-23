@@ -37,7 +37,6 @@ const CustomerInfo = () => {
                 notes: res.notes,
                 id: res.id
             }));
-            console.log(state);
         }).catch((err) => {
             setIsFetchingData(false);
         })

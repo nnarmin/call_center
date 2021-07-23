@@ -177,8 +177,6 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 });
             } else {
-                console.log(userState.name);
-                console.log(userState.surname);
                 post(`customers/`, {name: userState.name, surname: userState.surname}).then((res) => {
                     setUserState((prevState) => ({
                             ...prevState,
