@@ -27,10 +27,9 @@ export const AuthContextProvider = (props) => {
         token_decoded && token_decoded.auth.map((auth) => {
             if(auth.authority === "ROLE_ADMIN"){
                 setIsAdmin(true);
-                return;
             }
         })
-    }, [isAdmin]);
+    }, [token_decoded]);
 
     const loginHandler = (token, expirationTime) => {
         setToken(token);

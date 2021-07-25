@@ -30,7 +30,7 @@ const CustomerAddEdit = () => {
             "createdBy": "",
             "createdAt": "",
             "modifiedBy": "",
-            "modifiedAt": ""
+            "modifiedAt": "",
         }],
         addresses: [{
             "customer": {
@@ -49,9 +49,10 @@ const CustomerAddEdit = () => {
             },
             "id": "",
             "note": "",
-            "created_by": '',
-            "modified_by": '',
-            "modified_date": '',
+            "createdBy": "",
+            "createdAt": "",
+            "modifiedBy": "",
+            "modifiedAt": ""
         }],
         id: userId,
 
@@ -107,10 +108,11 @@ const CustomerAddEdit = () => {
                 "id": userId || userState.id
             },
             "id": "",
-            "created_by": '',
-            "modified_by": '',
-            "modified_date": '',
-            [type]: ""
+            "createdBy": "",
+            "createdAt": "",
+            "modifiedBy": "",
+            "modifiedAt": "",
+            [type]: "",
         }];
         setUserState((prevState) => (
             {
@@ -154,7 +156,6 @@ const CustomerAddEdit = () => {
                 [inputGroup]: alldata
             }
         ));
-        console.log(userState);
     }
 
     const onUpdateHandler = (id, index, type, event) => {
@@ -176,7 +177,6 @@ const CustomerAddEdit = () => {
                 });
             } else {
                 post(`customers/`, {name: userState.name, surname: userState.surname}).then((res) => {
-                    console.log(res)
                     setUserState((prevState) => ({
                             ...prevState,
                             name: res.name,
@@ -198,7 +198,6 @@ const CustomerAddEdit = () => {
                     setIsLoading(false);
                 });
             } else {
-                console.log(userState.contacts[index]);
                 post(`customer-contacts`, userState.contacts[index]).then((res) => {
                     setIsLoading(false);
                 }).catch((err) => {
@@ -343,7 +342,7 @@ const CustomerAddEdit = () => {
                                 səhifəyə
                                 qayıt
                             </Link>
-                            <div>
+                            {!isEditable && <div>
                                 <Button type="button"
                                         variant="success"
                                         className="mr-2"
@@ -352,6 +351,7 @@ const CustomerAddEdit = () => {
                                     Yeni əlaqə növü əlavə edin
                                 </Button>
                             </div>
+                            }
                         </div>
                     </Tab>
                     <Tab eventKey="address" title="Ünvan" disabled={type==="address" ? false : isDIsabled}>
@@ -394,7 +394,7 @@ const CustomerAddEdit = () => {
                                 səhifəyə
                                 qayıt
                             </Link>
-                            <div>
+                            {!isEditable && <div>
                                 <Button type="button"
                                         variant="success"
                                         className="mt-2 mr-2"
@@ -403,6 +403,7 @@ const CustomerAddEdit = () => {
                                     Yeni ünvan əlavə edin
                                 </Button>
                             </div>
+                            }
                         </div>
                     </Tab>
                     <Tab eventKey="note" title="Qeydlər" disabled={type==="note" ? false : isDIsabled}>
@@ -443,7 +444,7 @@ const CustomerAddEdit = () => {
                                   className="btn btn-info"> <i className="fas fa-angle-double-left ms-1"/> Əsas səhifəyə
                                 qayıt
                             </Link>
-                            <div>
+                            {!isEditable && <div>
                                 <Button type="button"
                                         variant="success"
                                         className="mt-2 mr-2"
@@ -452,6 +453,7 @@ const CustomerAddEdit = () => {
                                     Yeni ünvan əlavə edin
                                 </Button>
                             </div>
+                            }
                         </div>
 
                     </Tab>

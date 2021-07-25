@@ -2,8 +2,9 @@ import React from "react";
 import {Card} from "react-bootstrap";
 import PurchaseItem from "./PurchaseItem";
 import PurchaseNote from "./PurchaseNote";
+import PurchaseStatus from "./PurchaseStatus";
 
-const PurchaseInfo = () => {
+const PurchaseAddEdit = () => {
     return (
         <Card>
             <Card.Body>
@@ -28,6 +29,16 @@ const PurchaseInfo = () => {
                             aria-selected="false"
                         >Menecerin Qeydiyyatı</a>
                     </li>
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className="nav-link font-family-Roboto-Medium"
+                            data-mdb-toggle="tab"
+                            href="#purchaseStatus"
+                            role="tab"
+                            aria-controls="ex1-tabs-2"
+                            aria-selected="false"
+                        >Sifarişin Statusu</a>
+                    </li>
                 </ul>
                 <div className="tab-content">
                     <div className="tab-pane fade show active" id="purchaseItem" role="tabpanel">
@@ -44,10 +55,17 @@ const PurchaseInfo = () => {
                             </div>
                         </div>
                     </div>
+                    <div className="tab-pane fade" id="purchaseStatus" role="tabpanel">
+                        <div className="row">
+                            <div className="col-md-12">
+                                <PurchaseStatus/>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </Card.Body>
         </Card>
     )
 }
 
-export default PurchaseInfo;
+export default PurchaseAddEdit;

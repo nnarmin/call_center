@@ -26,7 +26,6 @@ const Search = (props) => {
     const fetchSearchResults = (pageNumber, query) => {
         if (token) {
             token.cancel();
-            console.log("cancelled")
         }
 
         token = axios.CancelToken.source();

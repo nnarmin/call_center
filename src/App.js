@@ -23,7 +23,8 @@ import CustomerInfo from './components/pages/Customer/CustomerInfo';
 import CustomerAddEdit from './components/pages/Customer/CustomerAddEdit';
 
 import AddPurchase from './components/pages/Purchase/AddPurchase';
-import PurchaseInfo from "./components/pages/Purchase/PurchaseInfo";
+import PurchaseAddEdit from "./components/pages/Purchase/PurchaseAddEdit";
+import PurchaseDetail from "./components/pages/Purchase/PurchaseDetail";
 
 
 export const IsAuth = createContext(null);
@@ -65,7 +66,8 @@ function App() {
                         <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
                         <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
                         <PrivateRoute path='/addPurchase/:customerID' component={AddPurchase}/>
-                        <PrivateRoute path='/purchaseInfo' component={PurchaseInfo}/>
+                        <PrivateRoute path='/purchaseInfo' component={PurchaseAddEdit}/>
+                        <PrivateRoute path='/purchase/view' component={PurchaseDetail}/>
                     </Switch>
                 </Layout>
             </UserInfo.Provider>

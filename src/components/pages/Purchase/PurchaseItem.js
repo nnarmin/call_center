@@ -10,9 +10,9 @@ import {formattedDate} from "../../helpers/formattedDate";
 
 const PurchaseItem = () => {
     const query = useQuery();
-    const purchase_id = query.get("purchaseID");
+    const purchase_id = query.get("purchase_id");
     const type = query.get("type");
-    const item_id = query.get("itemID");
+    const item_id = query.get("id");
     const isEditable = query.get("edit");
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -47,18 +47,26 @@ const PurchaseItem = () => {
         }).catch((err) => {
             setIsFetchingData(false);
         })
-        if(isEditable && type==='info'){
+        if(isEditable){
             getData();
         }
-    }, []);
+    }, [isEditable, type]);
 
     const getData = () => {
-        get(`/purchase-items/${item_id}`).then((res) => {
-            setPurchaseItem([res]);
-            setIsFetchingData(false);
-        }).catch(() => {
-            setIsFetchingData(false);
-        })
+        if(purchase_id){
+            get(`/purchase-items/search?purchaseId.equals=${purchase_id}&page=0&size=10`).then((res) => {
+                setPurchaseItem(res.content);
+                setIsFetchingData(false);
+            }).catch(err => setIsFetchingData(false))
+        }else{
+            get(`/purchase-items/${item_id}`).then((res) => {
+                setPurchaseItem([res]);
+                setIsFetchingData(false);
+            }).catch(() => {
+                setIsFetchingData(false);
+            })
+        }
+
     }
 
     const addNewPurchaseItem = () => {

@@ -3,7 +3,7 @@ import {Link, useParams, useHistory} from 'react-router-dom';
 import {get, remove} from "../../api/Api";
 import {Card} from "react-bootstrap";
 import Loader from "react-loader-spinner";
-import PurchaseList from "../Purchase/purchaseList";
+import PurchaseList from "../Purchase/PurchaseList";
 import {formattedDate} from "../../helpers/formattedDate";
 
 const CustomerInfo = () => {
