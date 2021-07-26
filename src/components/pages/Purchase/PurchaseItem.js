@@ -50,7 +50,7 @@ const PurchaseItem = () => {
         if(isEditable){
             getData();
         }
-    }, [isEditable, type]);
+    }, []);
 
     const getData = () => {
         if(purchase_id){
@@ -66,7 +66,6 @@ const PurchaseItem = () => {
                 setIsFetchingData(false);
             })
         }
-
     }
 
     const addNewPurchaseItem = () => {

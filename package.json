@@ -25,6 +25,7 @@
     "react-tabs": "^3.2.2",
     "react-toast-notifications": "^2.4.4",
     "robot3": "^0.2.19",
+    "sweetalert": "^2.1.2",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

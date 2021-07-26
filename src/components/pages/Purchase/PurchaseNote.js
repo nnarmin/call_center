@@ -6,13 +6,13 @@ import Loader from "react-loader-spinner";
 
 const PurchaseNote = () => {
     const query = useQuery();
-    const purchase_id = query.get("purchaseID");
+    const purchase_id = query.get("purchase_id");
     const type = query.get("type");
-    const item_id = query.get("itemID");
+    const item_id = query.get("id");
     const isEditable = query.get("edit");
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const [purchaseItem, setPurchaseItem] = useState([
+    const [purchaseNote, setPurchaseNote] = useState([
         {
             "createdBy": '',
             "createdAt": "",
@@ -31,23 +31,29 @@ const PurchaseNote = () => {
     ])
 
     useEffect(() => {
-        if(isEditable && type==='note'){
+        if(isEditable){
             getData();
         }
     }, []);
 
     const getData = () => {
-        get(`/purchase-notes/${item_id}`).then((res) => {
-            console.log(res);
-            setPurchaseItem([res]);
-            setIsFetchingData(false);
-        }).catch(() => {
-            setIsFetchingData(false);
-        })
+        if(purchase_id){
+            get(`/purchase-notes/search?purchaseId.equals=${purchase_id}&page=0&size=10`).then((res) => {
+                setPurchaseNote(res.content);
+                setIsFetchingData(false);
+            }).catch(err => setIsFetchingData(false))
+        }else{
+            get(`/purchase-notes/${item_id}`).then((res) => {
+                setPurchaseNote([res]);
+                setIsFetchingData(false);
+            }).catch(() => {
+                setIsFetchingData(false);
+            })
+        }
     }
 
     const addNewPurchaseItem = () => {
-        setPurchaseItem((prevState) => ([
+        setPurchaseNote((prevState) => ([
             ...prevState,
             {
                 "purchase": {
@@ -59,12 +65,12 @@ const PurchaseNote = () => {
     }
 
     const handleInputChange = (i, type, value) => {
-        let alldata = [...purchaseItem];
+        let alldata = [...setPurchaseNote];
         alldata[i] = {
             ...alldata[i],
             [type]: value
         }
-        setPurchaseItem(alldata);
+        setPurchaseNote(alldata);
     }
 
     const deletePurchaseItemHandler = () => {
@@ -77,7 +83,7 @@ const PurchaseNote = () => {
         if(isEditable){
 
         }else{
-            post('/purchase-notes', purchaseItem[index]).then((res) => {
+            post('/purchase-notes', setPurchaseNote[index]).then((res) => {
                 setIsLoading(false);
             }).catch(err => {
                 setIsLoading(false);
@@ -101,7 +107,7 @@ const PurchaseNote = () => {
     return (
         <div>
             <ul className="list-group">
-                {purchaseItem.length && purchaseItem.map((item, i) => (
+                {purchaseNote.length && purchaseNote.map((item, i) => (
                     <li className="list-group-item" key={i}>
                         <div className="row">
                             <div className="col-lg-8">
