@@ -1,44 +1,79 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
-import {get, remove} from "../../api/Api";
+import {get} from "../../api/Api";
 import {formattedDate} from "../../helpers/formattedDate";
+import {
+    Tab, Tabs, TabList, TabPanel,
+} from 'react-tabs';
+import 'react-tabs/style/react-tabs.css';
 import Loader from "react-loader-spinner";
 
 const PurchaseList = () => {
     const params = useParams();
     const userID = params.customerID;
-    const [isFetchingData, setIsFetchingData] = useState(false);
-    const [purchaseState, setPurchaseState] = useState({
-        content: [{
-            createdBy: "",
-            createdAt: "",
-            modifiedBy: "",
-            modifiedAt: "",
-            id: '',
-        }],
+    const [paginationInfo, setPaginationInfo] = useState({
         totalPages: '',
         last: '',
         first: '',
         number: '',
         page: 0
     });
+    const [isFetchingData, setIsFetchingData] = useState(false);
+    const [isPurchaseNoteLoading, setIsPurchaseNoteLoading] = useState(false);
+    const [isPurchaseItemLoading, setIsPurchaseItemLoading] = useState(false);
+    const [isPurchaseStatusLoading, setIsPurchaseStatusLoading] = useState(false);
+    const [purchaseState, setPurchaseState] = useState([]);
 
     useEffect(() => {
         setIsFetchingData(true)
-        get(`purchases/search?customerId.equals=${userID}&page=${purchaseState.page}&size=5`).then(res => {
-            setPurchaseState(prevState => ({
-                content: res.content,
+        get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=5`).then(res => {
+            setPaginationInfo(prevState => ({
+                ...prevState,
                 totalPages: res.totalPages,
                 last: res.last,
                 first: res.first,
                 number: res.number
             }))
-            setIsFetchingData(false);
+            res.content.length && res.content.map(purchase => {
+                setIsPurchaseStatusLoading(true);
+                setIsPurchaseNoteLoading(true);
+                setIsPurchaseItemLoading(true);
+                const resNote = [];
+                const resItem = [];
+                const resStatus = [];
+                get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resNote.push(...result.content);
+                    setIsPurchaseNoteLoading(false);
+                }).catch(err => {console.log(err)});
+                get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resItem.push(...result.content);
+                    setIsPurchaseItemLoading(false);
+                }).catch(err => { console.log(err) })
+                get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resStatus.push(...result.content)
+                    setIsPurchaseStatusLoading(false);
+                }).catch(err => {console.log(err)});
+
+                setPurchaseState((prevState => [
+                    ...prevState,
+                    {
+                        createdBy: purchase.createdBy,
+                        createdAt: purchase.createdAt,
+                        modifiedAt: purchase.modifiedAt,
+                        modifiedBy: purchase.modifiedBy,
+                        id: purchase.id,
+                        purchaseNote: resNote,
+                        purchaseItem: resItem,
+                        purchaseStatus: resStatus
+                    }
+                ]));
+            })
+            !isPurchaseNoteLoading && !isPurchaseStatusLoading && !isPurchaseItemLoading && setIsFetchingData(false);
         }).catch(err => console.log(err))
     }, [userID]);
 
     const paginate = (page) => {
-        setPurchaseState(prevState => ({
+        setPaginationInfo(prevState => ({
             ...prevState,
             page
         }));
@@ -46,29 +81,53 @@ const PurchaseList = () => {
     }
 
     const fetchData = (page) => {
-        setIsFetchingData(true)
+        setIsFetchingData(true);
+        setPurchaseState([]);
         get(`purchases/search?customerId.equals=${userID}&page=${page}&size=5`).then(res => {
-            setPurchaseState(prevState => ({
-                content: res.content,
+            setPaginationInfo(prevState => ({
+                page: page,
                 totalPages: res.totalPages,
                 last: res.last,
                 first: res.first,
                 number: res.number
             }))
-            setIsFetchingData(false);
+            res.content.length && res.content.map(purchase => {
+                setIsPurchaseStatusLoading(true);
+                setIsPurchaseNoteLoading(true);
+                setIsPurchaseItemLoading(true);
+                const resNote = [];
+                const resItem = [];
+                const resStatus = [];
+                get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resNote.push(...result.content);
+                    setIsPurchaseNoteLoading(false);
+                }).catch(err => {console.log(err)});
+                get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resItem.push(...result.content);
+                    setIsPurchaseItemLoading(false);
+                }).catch(err => { console.log(err) })
+                get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                    resStatus.push(...result.content)
+                    setIsPurchaseStatusLoading(false);
+                }).catch(err => {console.log(err)});
+
+                setPurchaseState((prevState => [
+                    ...prevState,
+                    {
+                        createdBy: purchase.createdBy,
+                        createdAt: purchase.createdAt,
+                        modifiedAt: purchase.modifiedAt,
+                        modifiedBy: purchase.modifiedBy,
+                        id: purchase.id,
+                        purchaseNote: resNote,
+                        purchaseItem: resItem,
+                        purchaseStatus: resStatus
+                    }
+                ]));
+            })
+            !isPurchaseNoteLoading && !isPurchaseStatusLoading && !isPurchaseItemLoading && setIsFetchingData(false);
         }).catch(err => console.log(err))
     }
-
-    const deleteHandle = (id, page) => {
-        setIsFetchingData(true);
-        console.log(page);
-        remove(`/purchases/${id}`).then((res) =>{
-            fetchData(page);
-            setIsFetchingData(false);
-        }).catch((error) => {
-            setIsFetchingData(false)
-        })
-    };
 
     if (isFetchingData) {
         return (
@@ -91,52 +150,160 @@ const PurchaseList = () => {
                             Yeni Sifariş
                         </Link>
                     </li>
-                    {purchaseState.content.map((purchase, i) => {
+                    {purchaseState.map((purchase, i) => {
                         return (
                             <li className="list-group-item" key={i}>
-                                <div className="d-flex justify-content-between align-items-center">
-                                    <div className="mb-2 flex-1">
+                                <div>
+                                    <div className="mb-2">
                                         <strong>{formattedDate(purchase.createdAt)}</strong> tarixində <strong>{purchase.createdBy}</strong> tərəfindən
-                                        verilən <Link className='mr-3 btn-xs'
-                                        to={`/purchase/view?id=${purchase.id}`}
-                                        >sifariş</Link>
+                                        verilən sifariş
                                     </div>
-                                    <div className='table-actions text-right'>
-                                        <Link
-                                            className='mr-3 btn-xs'
-                                            to={`/purchaseInfo?edit=true&purchase_id=${purchase.id}`}
-                                        >
-                                            <i className='fas fa-edit fa-sm text-success'/>
-                                        </Link>
-                                        <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, purchase.id, purchaseState.page)}>
-                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                        </span>
+                                    <div className="flex-1">
+                                        <Tabs>
+                                            <TabList>
+                                                <Tab>Sifarişlər</Tab>
+                                                <Tab>Qeydlər</Tab>
+                                                <Tab>Status</Tab>
+                                            </TabList>
+                                            <TabPanel>
+                                                <table className="table table-bordered table-hover mb-0">
+                                                    <thead className="library-table-head">
+                                                    <tr>
+                                                        <th className="library-table-index" scope="col">#</th>
+                                                        <th scope="col">Sifariş adı</th>
+                                                        <th scope="col">Ödəniş növü</th>
+                                                        <th scope="col">Qiymət</th>
+                                                        <th scope="col">Say</th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {purchase.purchaseItem.map(({
+                                                                                    id,
+                                                                                    item,
+                                                                                    paymentType,
+                                                                                    qty,
+                                                                                    price
+                                                                                }, k) => {
+                                                        return (
+                                                            <tr key={k + 1}>
+                                                                <td className="table-index width-25">{k + 1}</td>
+                                                                <td>{item}</td>
+                                                                <td>{paymentType.name}</td>
+                                                                <td>{price}</td>
+                                                                <td>{qty}</td>
+                                                                <td className="table-actions text-right">
+                                                                    <Link
+                                                                        className='mr-3 btn-xs'
+                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
+                                                                    >
+                                                                        <i className='fas fa-edit fa-sm text-success'/>
+                                                                    </Link>
+                                                                    <span className='ml-2 btn-xs delete-button'>
+                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                            </span>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                    </tbody>
+                                                </table>
+                                            </TabPanel>
+                                            <TabPanel>
+                                                <table className="table table-bordered table-hover mb-0">
+                                                    <thead className="library-table-head">
+                                                    <tr>
+                                                        <th className="library-table-index" scope="col">#</th>
+                                                        <th scope="col">Qeyd</th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {purchase.purchaseNote.map(({id, note}, k) => {
+                                                        return (
+                                                            <tr key={k}>
+                                                                <td className="table-index width-25">{k}</td>
+                                                                <td className="d-flex justify-content-between">
+                                                                    <span>{note}</span>
+                                                                </td>
+                                                                <td className="table-actions text-right">
+                                                                    <Link
+                                                                        className='mr-3 btn-xs'
+                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
+                                                                    >
+                                                                        <i className='fas fa-edit fa-sm text-success'/>
+                                                                    </Link>
+                                                                    <span className='ml-2 btn-xs delete-button'>
+                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                            </span>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                    </tbody>
+                                                </table>
+                                            </TabPanel>
+                                            <TabPanel>
+                                                <table className="table table-bordered table-hover mb-0">
+                                                    <thead className="library-table-head">
+                                                    <tr>
+                                                        <th className="library-table-index" scope="col">#</th>
+                                                        <th scope="col">Status</th>
+                                                        <th scope="col">Qeyd</th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    {purchase.purchaseStatus.map(({id, note, statusType}, k) => {
+                                                        return (
+                                                            <tr key={k + 1}>
+                                                                <td className="table-index width-25">{k + 1}</td>
+                                                                <td>{statusType.name}</td>
+                                                                <td>{note}</td>
+                                                                <td className="table-actions text-right">
+                                                                    <Link
+                                                                        className='mr-3 btn-xs'
+                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
+                                                                    >
+                                                                        <i className='fas fa-edit fa-sm text-success'/>
+                                                                    </Link>
+                                                                    <span className='ml-2 btn-xs delete-button'>
+                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                            </span>
+                                                                </td>
+                                                            </tr>
+                                                        )
+                                                    })}
+                                                    </tbody>
+                                                </table>
+                                            </TabPanel>
+                                        </Tabs>
                                     </div>
                                 </div>
                             </li>
                         )
                     })}
                 </ul>
-                {purchaseState.totalPages &&
+                {paginationInfo.totalPages &&
                 <div className='row pt-2'>
                     <div className='col-md-6'>
                         <nav aria-label='Page navigation example p-0'>
                             <ul className='pagination mb-0'>
-                                <li className={`page-item ${purchaseState.first ? 'disabled' : ''}`}>
-                                    <button onClick={paginate.bind(this, purchaseState.page - 1)} type='button'
+                                <li className={`page-item ${paginationInfo.first ? 'disabled' : ''}`}>
+                                    <button onClick={paginate.bind(this, paginationInfo.page - 1)} type='button'
                                             className='page-link'>
                                         Əvvəlki
                                     </button>
                                 </li>
-                                {Array.from(Array(purchaseState.totalPages).keys()).map((num) => (
+                                {[...Array(paginationInfo.totalPages).keys()].map((num) => (
                                     <li key={num}
-                                        className={`page-item ${purchaseState.number === num ? 'active' : ''}`}>
+                                        className={`page-item ${paginationInfo.number === num ? 'active' : ''}`}>
                                         <button type='button' onClick={paginate.bind(this, num)}
                                                 className='page-link'>{+num + 1}</button>
                                     </li>
                                 ))}
-                                <li className={`page-item ${purchaseState.last ? 'disabled' : ''}`}>
-                                    <button type='button' onClick={paginate.bind(this, purchaseState.page + 1)}
+                                <li className={`page-item ${paginationInfo.last ? 'disabled' : ''}`}>
+                                    <button type='button' onClick={paginate.bind(this, paginationInfo.page + 1)}
                                             className='page-link'>
                                         Növbəti
                                     </button>

@@ -28,27 +28,9 @@ const PurchaseList = () => {
         modifiedBy: "",
         modifiedAt: "",
         id: '',
-        purchaseItem: [/*{
-            item: '',
-            price: '',
-            paymentType: {
-                id: '',
-                name: ''
-            },
-            qty: '',
-            id: ''
-        }*/],
-        purchaseNote: [/*{
-            note: '',
-            id: ''
-        }*/],
-        purchaseStatus: [/*{
-            statusType: {
-                id: '',
-                name: ''
-            },
-            note: ''
-        }*/],
+        purchaseItem: [],
+        purchaseNote: [],
+        purchaseStatus: [],
     }]);
 
     useEffect(() => {
@@ -61,7 +43,6 @@ const PurchaseList = () => {
                 first: res.first,
                 number: res.number
             }))
-            const purchaseArr = [];
             res.content.length && res.content.map(purchase => {
                 setIsPurchaseStatusLoading(true);
                 setIsPurchaseNoteLoading(true);
@@ -80,20 +61,24 @@ const PurchaseList = () => {
                 get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
                     resStatus.push(...result.content)
                     setIsPurchaseStatusLoading(false);
-                }).catch(err => {console.log(err)})
-                purchaseArr.push({
-                    createdBy: purchase.createdBy,
-                    createdAt: purchase.createdAt,
-                    modifiedAt: purchase.modifiedAt,
-                    modifiedBy: purchase.modifiedBy,
-                    id: purchase.id,
-                    purchaseNote: resNote,
-                    purchaseItem: resItem,
-                    purchaseStatus: resStatus
-                })
+                }).catch(err => {console.log(err)});
+
+                setPurchaseState((prevState => [
+                    ...prevState,
+                    {
+                        createdBy: purchase.createdBy,
+                        createdAt: purchase.createdAt,
+                        modifiedAt: purchase.modifiedAt,
+                        modifiedBy: purchase.modifiedBy,
+                        id: purchase.id,
+                        purchaseNote: resNote,
+                        purchaseItem: resItem,
+                        purchaseStatus: resStatus
+                    }
+                ]));
+
             })
 
-            setPurchaseState(purchaseArr);
             !isPurchaseNoteLoading && !isPurchaseStatusLoading && !isPurchaseItemLoading && setIsFetchingData(false);
         }).catch(err => console.log(err))
     }, [userID]);

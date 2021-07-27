@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useParams, useHistory} from 'react-router-dom';
 import {get, remove} from "../../api/Api";
-import {Card} from "react-bootstrap";
+import {Card, Tabs, Tab} from "react-bootstrap";
 import Loader from "react-loader-spinner";
 import PurchaseList from "../Purchase/PurchaseList";
-import {formattedDate} from "../../helpers/formattedDate";
+import DeleteConfirmation from "../../components/ConfirmationModal";
 
 const CustomerInfo = () => {
     const history = useHistory();
@@ -12,6 +12,8 @@ const CustomerInfo = () => {
     const params = useParams();
     const userID = params.customerID;
     const [isFetchingData, setIsFetchingData] = useState(true);
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState(null);
     const [state, setState] = useState({
         name: '',
         surname: '',
@@ -20,10 +22,26 @@ const CustomerInfo = () => {
         notes: []
     });
 
+    const [type, setType] = useState('');
+    const [key, setKey] = useState('');
+    const [id, setId] = useState('');
 
     useEffect(() => {
         getUserInfo(userID);
     }, []);
+
+    const showDeleteModal = (key, type, id) => {
+        setType(type);
+        setId(id);
+        setKey(key);
+        setDeleteMessage(`Məlumatı silmək istədiyinizdən əminsiniz?`);
+        setDisplayConfirmationModal(true);
+    };
+
+    // Hide the modal
+    const hideConfirmationModal = () => {
+        setDisplayConfirmationModal(false);
+    };
 
     const getUserInfo = (userID) => {
         setIsFetchingData(true);
@@ -49,19 +67,21 @@ const CustomerInfo = () => {
     }
 
     const deleteHandle = (key, type, id) => {
+        console.log(key, type, id)
         let data = [...state[type]];
-        data.splice(key, 1);
-        setState((prevState) => (
-            {
-                ...prevState,
-                [type]: data
-            }
-        ));
         remove(`customer-${type}/${id}`).then(res => {
             setIsFetchingData(false);
+            data.splice(key, 1);
+            setState((prevState) => (
+                {
+                    ...prevState,
+                    [type]: data
+                }
+            ));
         }).catch(err => {
             setIsFetchingData(false);
-        })
+        });
+        setDisplayConfirmationModal(false);
     }
 
     if (isFetchingData) {
@@ -95,63 +115,20 @@ const CustomerInfo = () => {
                     </div>
                 </Card.Header>
                 <Card.Body>
-                    <ul className="nav nav-tabs mb-3" id="ex1" role="tablist">
-                        <li className="nav-item" role="presentation">
-                            <a
-                                className="nav-link font-family-Roboto-Medium active"
-                                data-mdb-toggle="tab"
-                                href="#purchases"
-                                role="tab"
-                                aria-controls="ex1-tabs-1"
-                                aria-selected="true"
-                            >Sifarişlər</a>
-                        </li>
-                        <li className="nav-item" role="presentation">
-                            <a
-                                className="nav-link font-family-Roboto-Medium"
-                                data-mdb-toggle="tab"
-                                href="#contacts"
-                                role="tab"
-                                aria-controls="ex1-tabs-2"
-                                aria-selected="false"
-                            >Əlaqə Məlumatları</a>
-                        </li>
-                        <li className="nav-item" role="presentation">
-                            <a
-                                className="nav-link font-family-Roboto-Medium"
-                                data-mdb-toggle="tab"
-                                href="#addresses"
-                                role="tab"
-                                aria-controls="ex1-tabs-1"
-                                aria-selected="true"
-                            >Ünvan</a>
-                        </li>
-                        <li className="nav-item" role="presentation">
-                            <a
-                                className="nav-link font-family-Roboto-Medium"
-                                data-mdb-toggle="tab"
-                                href="#notes"
-                                role="tab"
-                                aria-controls="ex1-tabs-2"
-                                aria-selected="false"
-                            >Qeydlər</a>
-                        </li>
-                    </ul>
-                    <div className="tab-content">
-                        <div className="tab-pane fade show active" id="purchases" role="tabpanel">
-                            <div className="row">
-                                <div className="col-md-12">
-                                    <PurchaseList user_id={userID}/>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="tab-pane fade" id="contacts" role="tabpanel">
+                    <Tabs
+                        id="controlled-tab-example"
+                        className="mb-3"
+                    >
+                        <Tab eventKey="purchases" title="Sifarişlər">
+                            <PurchaseList user_id={userID}/>
+                        </Tab>
+                        <Tab eventKey="contacts" title="Əlaqə">
                             <div className="row">
                                 <div className="col-md-12">
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                             <div className="mb-0 font-family-Roboto-Medium">Əlaqə məlumatları</div>
-                                            <Link to={`/customer/add?type=contact&id=${userID}`}
+                                            <Link to={`/customer/add?id=${userID}&type=contact`}
                                                   type="button"
                                                   className="btn btn-primary">
                                                 Yeni Əlaqə
@@ -171,7 +148,7 @@ const CustomerInfo = () => {
                                                             <i className='fas fa-edit fa-sm text-success'/>
                                                         </Link>
                                                         <span className='ml-2 btn-xs delete-button'
-                                                            onClick={deleteHandle.bind(this, i, "contacts", id)}>
+                                                              onClick={showDeleteModal.bind(this, i, "contacts", id)}>
                                                             <i className="fas fa-trash-alt fa-sm text-danger"/>
                                                         </span>
                                                     </div>
@@ -182,14 +159,14 @@ const CustomerInfo = () => {
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                        <div className="tab-pane fade" id="addresses" role="tabpanel">
+                        </Tab>
+                        <Tab eventKey="addresses" title="Ünvan">
                             <div className="row">
                                 <div className="col-md-12">
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                             <div className="mb-0 font-family-Roboto-Medium">Ünvan məlumatları</div>
-                                            <Link to={`/customer/add?type=address&id=${userID}`}
+                                            <Link to={`/customer/add?id=${userID}&type=address`}
                                                   type="button"
                                                   className="btn btn-primary">
                                                 Yeni Ünvan
@@ -206,7 +183,7 @@ const CustomerInfo = () => {
                                                             <i className='fas fa-edit fa-sm text-success'/>
                                                         </Link>
                                                         <span className='ml-2 btn-xs delete-button'
-                                                              onClick={deleteHandle.bind(this, i, "addresses", id)}>
+                                                              onClick={showDeleteModal.bind(this, i, "addresses", id)}>
                                                             <i className="fas fa-trash-alt fa-sm text-danger"/>
                                                         </span>
                                                     </div>
@@ -217,14 +194,14 @@ const CustomerInfo = () => {
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                        <div className="tab-pane fade" id="notes" role="tabpanel">
+                        </Tab>
+                        <Tab eventKey="notes" title="Qeydlər">
                             <div className="row">
                                 <div className="col-md-12">
                                     <ul className="list-group">
                                         <li className="list-group-item list-group-item-primary d-flex align-items-center justify-content-between">
                                             <div className="mb-0 font-family-Roboto-Medium">Qeydlər</div>
-                                            <Link to={`/customer/add?type=note&id=${userID}`} type="button"
+                                            <Link to={`/customer/add?id=${userID}&type=note`} type="button"
                                                   className="btn btn-primary">
                                                 Yeni Qeyd
                                             </Link>
@@ -241,7 +218,7 @@ const CustomerInfo = () => {
                                                             <i className='fas fa-edit fa-sm text-success'/>
                                                         </Link>
                                                         <span className='ml-2 btn-xs delete-button'
-                                                              onClick={deleteHandle.bind(this, i, "notes", id)}>
+                                                              onClick={showDeleteModal.bind(this, i, "notes", id)}>
                                                             <i className="fas fa-trash-alt fa-sm text-danger"/>
                                                         </span>
                                                     </div>
@@ -252,9 +229,10 @@ const CustomerInfo = () => {
                                     </ul>
                                 </div>
                             </div>
-                        </div>
-                    </div>
+                        </Tab>
+                    </Tabs>
                 </Card.Body>
+                <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle} hideModal={hideConfirmationModal} type={type} id={id} index={key} message={deleteMessage}  />
             </Card>
         </React.Fragment>
     );

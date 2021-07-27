@@ -62,6 +62,7 @@ const CustomerAddEdit = () => {
         let unmounted = false;
         if(type){
             setActiveTab(type);
+            console.log(activeTab)
         }
         if (isEditable) {
             setIsFetchingData(true);
@@ -86,7 +87,7 @@ const CustomerAddEdit = () => {
         return () => {
             unmounted = true
         };
-    }, [isEditable, userId, isDIsabled, type]);
+    }, [isEditable, userId, isDIsabled, type, activeTab]);
 
     const getData = (type) => {
         setIsFetchingData(true);
