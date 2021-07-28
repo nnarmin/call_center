@@ -11,7 +11,7 @@ const PaginationComponent = (props) =>{
                                 Əvvəlki
                             </button>
                         </li>
-                        {Array.from(Array(props.result?.totalPages).keys()).map((num) => (
+                        {[...Array(props.result?.totalPages).keys()].map((num) => (
                             <li key={num} className={`page-item ${props.result?.number === num ? 'active' : ''}`}>
                                 <button onClick={props.onPaginate(num)} type='button'
                                         className='page-link'>{+num + 1}</button>

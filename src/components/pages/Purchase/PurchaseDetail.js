@@ -35,11 +35,6 @@ const TemplateDetail = () => {
         setIsLoading(false);
     }, [history, purchaseId]);
 
-
-    const deleteHandle = () => {
-
-    }
-
     return (
         <Card style={{ minHeight: 300 }}>
             <Card.Header className='my-3'>

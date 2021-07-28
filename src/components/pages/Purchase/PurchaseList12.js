@@ -180,7 +180,7 @@ const PurchaseList = () => {
                                         Əvvəlki
                                     </button>
                                 </li>
-                                {Array.from(Array(purchaseState.totalPages).keys()).map((num) => (
+                                {[...Array(purchaseState.totalPages).keys()].map((num) => (
                                     <li key={num}
                                         className={`page-item ${purchaseState.number === num ? 'active' : ''}`}>
                                         <button type='button' onClick={paginate.bind(this, num)}

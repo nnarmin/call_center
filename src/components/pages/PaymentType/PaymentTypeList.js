@@ -83,16 +83,15 @@ const PaymentList = (props) => {
                                 <i className='fas fa-edit fa-sm text-success'/>
                             </Link>
                             <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
-                                    <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                </span>
+                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                            </span>
                         </td>
                     </tr>
                 ))}
                 </tbody>
             </Table>
-            {/*<PaginationComponent result={res} currentPage={page} paginate={paginate.bind(this, currentPage)}/>*/}
             <div className='row pt-2'>
-                <div className='col-md-4'>
+                <div className='col-md-12'>
                     <nav aria-label='Page navigation example p-0'>
                         <ul className='pagination mb-0'>
                             <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
@@ -100,7 +99,7 @@ const PaymentList = (props) => {
                                     Əvvəlki
                                 </button>
                             </li>
-                            {Array.from(Array(res?.totalPages).keys()).map((num) => (
+                            {[...Array(res.totalPages).keys()].map((num) => (
                                 <li key={num} className={`page-item ${res?.number === num ? 'active' : ''}`}>
                                     <button onClick={paginate.bind(this, num)} type='button'
                                             className='page-link'>{+num + 1}</button>
@@ -113,15 +112,6 @@ const PaymentList = (props) => {
                             </li>
                         </ul>
                     </nav>
-                </div>
-                <div className='col-md-4'>
-                    <div className='text-muted text-center'>
-                        <span>
-                          Toplam məlumat:
-                            {' '}
-                            {res?.totalElements}
-                        </span>
-                    </div>
                 </div>
             </div>
         </>

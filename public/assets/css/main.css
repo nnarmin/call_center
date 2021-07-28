@@ -87,3 +87,12 @@ a:hover{
 .cursor-pointer{
     cursor: pointer;
 }
+
+.btn-xs.btn-floating{
+    width: 1.5rem;
+    height: 1.5rem;
+}
+.btn-xs.btn-floating .fab, .btn-xs.btn-floating .far, .btn-xs.btn-floating .fas {
+    width: 1.5rem;
+    line-height: 1.5rem;
+}

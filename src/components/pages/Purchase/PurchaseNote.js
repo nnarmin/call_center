@@ -65,7 +65,7 @@ const PurchaseNote = () => {
     }
 
     const handleInputChange = (i, type, value) => {
-        let alldata = [...setPurchaseNote];
+        let alldata = [...purchaseNote];
         alldata[i] = {
             ...alldata[i],
             [type]: value
@@ -83,7 +83,7 @@ const PurchaseNote = () => {
         if(isEditable){
 
         }else{
-            post('/purchase-notes', setPurchaseNote[index]).then((res) => {
+            post('/purchase-notes', purchaseNote[index]).then((res) => {
                 setIsLoading(false);
             }).catch(err => {
                 setIsLoading(false);

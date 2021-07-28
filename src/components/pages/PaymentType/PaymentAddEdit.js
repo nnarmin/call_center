@@ -51,7 +51,6 @@ const PaymentAddEdit = () => {
                 setIsLoading(false);
             });
         }
-
     };
 
     if (isFetchingData) {

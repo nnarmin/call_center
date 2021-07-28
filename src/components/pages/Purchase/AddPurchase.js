@@ -46,7 +46,7 @@ const AddPurchase = () => {
             }
         };
         post('/purchases', purchaseData).then((res) => {
-            history.push(`/purchaseInfo?id=${userID}&purchaseID=${res.id}`);
+            history.push(`/purchaseInfo?id=${userID}&purchase_id=${res.id}`);
             setIsLoading(false);
         }).catch((err) => {
             setIsLoading(false);
@@ -76,7 +76,7 @@ const AddPurchase = () => {
                                 <Select
                                     styles={selectStyles}
                                     options={socialTypeList}
-                                    components={{NoOptionsMessage: (props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}}
+                                    components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
                                     onChange={handleSelectChange}
                                     placeholder='Sosial Şəbəkə növünü seçin...'
                                 />

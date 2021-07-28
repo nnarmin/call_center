@@ -1,71 +1,43 @@
-import React from "react";
-import {Card} from "react-bootstrap";
+import React, {useEffect, useState} from 'react';
+import {useQuery} from "../../hooks/useQuery";
+import {Card, Tabs, Tab} from "react-bootstrap";
 import PurchaseItem from "./PurchaseItem";
 import PurchaseNote from "./PurchaseNote";
 import PurchaseStatus from "./PurchaseStatus";
 
 const PurchaseAddEdit = () => {
+    let query = useQuery();
+    const type = query.get('type');
+    const isEditable = query.get('edit');
+    const [isDisabled, setIsDisabled] = useState(true);
+    const [activeTab, setActiveTab] = useState('purchaseInfo');
+
+    useEffect(() => {
+        alert(type)
+        if(isEditable && type){
+            setActiveTab(type);
+            console.log(activeTab)
+        }
+    }, [isEditable, type]);
+
     return (
         <Card>
             <Card.Body>
-                <ul className="nav nav-tabs mb-3" id="ex1" role="tablist">
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className="nav-link font-family-Roboto-Medium active"
-                            data-mdb-toggle="tab"
-                            href="#purchaseItem"
-                            role="tab"
-                            aria-controls="ex1-tabs-1"
-                            aria-selected="true"
-                        >Alış Məhsulu Haqqında İnformasiya</a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className="nav-link font-family-Roboto-Medium"
-                            data-mdb-toggle="tab"
-                            href="#purchaseNote"
-                            role="tab"
-                            aria-controls="ex1-tabs-2"
-                            aria-selected="false"
-                        >Menecerin Qeydiyyatı</a>
-                    </li>
-                    <li className="nav-item" role="presentation">
-                        <a
-                            className="nav-link font-family-Roboto-Medium"
-                            data-mdb-toggle="tab"
-                            href="#purchaseStatus"
-                            role="tab"
-                            aria-controls="ex1-tabs-2"
-                            aria-selected="false"
-                        >Sifarişin Statusu</a>
-                    </li>
-                </ul>
-                <div className="tab-content">
-                    <div className="tab-pane fade show active" id="purchaseItem" role="tabpanel">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <PurchaseItem/>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="tab-pane fade" id="purchaseNote" role="tabpanel">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <PurchaseNote/>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="tab-pane fade" id="purchaseStatus" role="tabpanel">
-                        <div className="row">
-                            <div className="col-md-12">
-                                <PurchaseStatus/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Tabs defaultActiveKey={activeTab} className="mb-3">
+                    <Tab eventKey="purchaseInfo" title="Sifariş Məhsulu">
+                        <PurchaseItem/>
+                    </Tab>
+                    <Tab eventKey="note" title="Sifariş Qeydləri">
+                        <PurchaseNote/>
+                    </Tab>
+                    <Tab eventKey="status" title="Sifariş Statusu">
+                        <PurchaseStatus/>
+                    </Tab>
+                </Tabs>
             </Card.Body>
         </Card>
     )
 }
 
 export default PurchaseAddEdit;
+

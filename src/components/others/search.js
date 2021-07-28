@@ -27,7 +27,6 @@ const Search = (props) => {
         if (token) {
             token.cancel();
         }
-
         token = axios.CancelToken.source();
         const searchUrl = `${props.search_url}=${query}&page=${pageNumber}&size=10`;
         setState(prevState => ({
@@ -120,7 +119,7 @@ const Search = (props) => {
                                         Əvvəlki
                                     </button>
                                 </li>
-                                {Array.from(Array(state.results?.totalPages).keys()).map((num) => (
+                                {[...Array(state.results?.totalPages).keys()].map((num) => (
                                     <li key={num}
                                         className={`page-item ${state.results?.number === num ? 'active' : ''}`}>
                                         <button type='button' onClick={paginate.bind(this, num)}

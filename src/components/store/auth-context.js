@@ -31,7 +31,7 @@ export const AuthContextProvider = (props) => {
         })
     }, [token_decoded]);
 
-    const loginHandler = (token, expirationTime) => {
+    const loginHandler = (token) => {
         setToken(token);
         localStorage.setItem("jwt_token", token);
         window.location.href = '/';

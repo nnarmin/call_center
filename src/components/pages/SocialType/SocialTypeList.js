@@ -88,7 +88,7 @@ const SocialList = () => {
                 </tbody>
             </Table>
             <div className='row pt-2'>
-                <div className='col-md-4'>
+                <div className='col-md-6'>
                     <nav aria-label='Page navigation example p-0'>
                         <ul className='pagination mb-0'>
                             <li className={`page-item ${res?.first ? 'disabled' : ''}`}>
@@ -96,7 +96,7 @@ const SocialList = () => {
                                     Əvvəlki
                                 </button>
                             </li>
-                            {Array.from(Array(res?.totalPages).keys()).map((num) => (
+                            {[...Array(res?.totalPages).keys()].map((num) => (
                                 <li key={num} className={`page-item ${res?.number === num ? 'active' : ''}`}>
                                     <button onClick={paginate.bind(this, num)} type='button'
                                             className='page-link'>{+num + 1}</button>
@@ -109,15 +109,6 @@ const SocialList = () => {
                             </li>
                         </ul>
                     </nav>
-                </div>
-                <div className='col-md-4'>
-                    <div className='text-muted text-center'>
-                        <span>
-                          Toplam məlumat:
-                            {' '}
-                            {res?.totalElements}
-                        </span>
-                    </div>
                 </div>
             </div>
         </>

@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
-import {get} from "../../api/Api";
+import {get, remove} from "../../api/Api";
 import {formattedDate} from "../../helpers/formattedDate";
+import DeleteConfirmation from "../../components/ConfirmationModal";
 import {
     Tab, Tabs, TabList, TabPanel,
 } from 'react-tabs';
@@ -11,6 +12,8 @@ import Loader from "react-loader-spinner";
 const PurchaseList = () => {
     const params = useParams();
     const userID = params.customerID;
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState(null);
     const [paginationInfo, setPaginationInfo] = useState({
         totalPages: '',
         last: '',
@@ -19,14 +22,17 @@ const PurchaseList = () => {
         page: 0
     });
     const [isFetchingData, setIsFetchingData] = useState(false);
-    const [isPurchaseNoteLoading, setIsPurchaseNoteLoading] = useState(false);
-    const [isPurchaseItemLoading, setIsPurchaseItemLoading] = useState(false);
-    const [isPurchaseStatusLoading, setIsPurchaseStatusLoading] = useState(false);
+    const [isFetchingItemData, setIsFetchingItemData] = useState(false);
+    const [isFetchingNoteData, setIsFetchingNoteData] = useState(false);
+    const [isFetchingStatusData, setIsFetchingStatusData] = useState(false);
     const [purchaseState, setPurchaseState] = useState([]);
+    const [type, setType] = useState('');
+    const [key, setKey] = useState('');
+    const [id, setId] = useState('');
 
     useEffect(() => {
         setIsFetchingData(true)
-        get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=5`).then(res => {
+        get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=3`).then(res => {
             setPaginationInfo(prevState => ({
                 ...prevState,
                 totalPages: res.totalPages,
@@ -34,27 +40,44 @@ const PurchaseList = () => {
                 first: res.first,
                 number: res.number
             }))
-            res.content.length && res.content.map(purchase => {
-                setIsPurchaseStatusLoading(true);
-                setIsPurchaseNoteLoading(true);
-                setIsPurchaseItemLoading(true);
+            res.content.length && res.content.map(async purchase => {
+                console.log(purchase.id)
+                setIsFetchingItemData(true);
+                setIsFetchingNoteData(true);
+                setIsFetchingStatusData(true);
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
-                get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                await get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resNote.push(...result.content);
-                    setIsPurchaseNoteLoading(false);
-                }).catch(err => {console.log(err)});
-                get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
-                    resItem.push(...result.content);
-                    setIsPurchaseItemLoading(false);
-                }).catch(err => { console.log(err) })
-                get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
-                    resStatus.push(...result.content)
-                    setIsPurchaseStatusLoading(false);
+                    console.log("note", result.content)
+                    setIsFetchingItemData(false);
                 }).catch(err => {console.log(err)});
 
-                setPurchaseState((prevState => [
+                await get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
+                    resItem.push(...result.content);
+                    console.log("item", result.content)
+                    setIsFetchingNoteData(false);
+                }).catch(err => {console.log(err)})
+
+                await get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
+                    resStatus.push(...result.content)
+                    console.log("status", result.content)
+                    setIsFetchingStatusData(false);
+                }).catch(err => {console.log(err)});
+
+                console.log("state", {
+                    createdBy: purchase.createdBy,
+                    createdAt: purchase.createdAt,
+                    modifiedAt: purchase.modifiedAt,
+                    modifiedBy: purchase.modifiedBy,
+                    id: purchase.id,
+                    purchaseNote: resNote,
+                    purchaseItem: resItem,
+                    purchaseStatus: resStatus
+                })
+
+                await setPurchaseState((prevState => [
                     ...prevState,
                     {
                         createdBy: purchase.createdBy,
@@ -67,10 +90,11 @@ const PurchaseList = () => {
                         purchaseStatus: resStatus
                     }
                 ]));
+
             })
-            !isPurchaseNoteLoading && !isPurchaseStatusLoading && !isPurchaseItemLoading && setIsFetchingData(false);
+            setIsFetchingData(false);
         }).catch(err => console.log(err))
-    }, [userID]);
+    }, []);
 
     const paginate = (page) => {
         setPaginationInfo(prevState => ({
@@ -83,33 +107,33 @@ const PurchaseList = () => {
     const fetchData = (page) => {
         setIsFetchingData(true);
         setPurchaseState([]);
-        get(`purchases/search?customerId.equals=${userID}&page=${page}&size=5`).then(res => {
+        get(`purchases/search?customerId.equals=${userID}&page=${page}&size=3`).then(res => {
             setPaginationInfo(prevState => ({
-                page: page,
+                ...prevState,
                 totalPages: res.totalPages,
                 last: res.last,
                 first: res.first,
                 number: res.number
             }))
-            res.content.length && res.content.map(purchase => {
-                setIsPurchaseStatusLoading(true);
-                setIsPurchaseNoteLoading(true);
-                setIsPurchaseItemLoading(true);
+            res.content.length && res.content.map(async purchase => {
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
-                get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                await get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resNote.push(...result.content);
-                    setIsPurchaseNoteLoading(false);
-                }).catch(err => {console.log(err)});
-                get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                }).catch(err => {
+                    console.log(err)
+                });
+                await get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resItem.push(...result.content);
-                    setIsPurchaseItemLoading(false);
-                }).catch(err => { console.log(err) })
-                get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=10`).then(result => {
+                }).catch(err => {
+                    console.log(err)
+                })
+                await get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resStatus.push(...result.content)
-                    setIsPurchaseStatusLoading(false);
-                }).catch(err => {console.log(err)});
+                }).catch(err => {
+                    console.log(err)
+                });
 
                 setPurchaseState((prevState => [
                     ...prevState,
@@ -125,8 +149,31 @@ const PurchaseList = () => {
                     }
                 ]));
             })
-            !isPurchaseNoteLoading && !isPurchaseStatusLoading && !isPurchaseItemLoading && setIsFetchingData(false);
+            setIsFetchingData(false);
         }).catch(err => console.log(err))
+    }
+
+    const showDeleteModal = (key, type, id) => {
+        setType(type);
+        setId(id);
+        setKey(key);
+        setDeleteMessage(`Məlumatı silmək istədiyinizdən əminsiniz?`);
+        setDisplayConfirmationModal(true);
+    };
+
+    // Hide the modal
+    const hideConfirmationModal = () => {
+        setDisplayConfirmationModal(false);
+    };
+
+    const deleteHandle = (key, type, id) => {
+        remove(`${type}/${id}`).then(res => {
+            fetchData(paginationInfo.page);
+            setIsFetchingData(false);
+        }).catch(err => {
+            setIsFetchingData(false);
+        });
+        setDisplayConfirmationModal(false);
     }
 
     if (isFetchingData) {
@@ -154,9 +201,17 @@ const PurchaseList = () => {
                         return (
                             <li className="list-group-item" key={i}>
                                 <div>
-                                    <div className="mb-2">
-                                        <strong>{formattedDate(purchase.createdAt)}</strong> tarixində <strong>{purchase.createdBy}</strong> tərəfindən
-                                        verilən sifariş
+                                    <div className="d-flex justify-content-between align-items-center">
+                                        <div className="mb-2 flex-1">
+                                            <strong>{formattedDate(purchase.createdAt)}</strong> tarixində <strong>{purchase.createdBy}</strong> tərəfindən
+                                            verilən sifariş.
+                                        </div>
+                                        <div>
+                                            <span className="mr-3 btn-danger btn btn-floating btn-xs delete-button"
+                                                  onClick={showDeleteModal.bind(this, 0, "purchases", purchase.id)}>
+                                                    <i className="fas fa-trash-alt fa-sm"/>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="flex-1">
                                         <Tabs>
@@ -166,116 +221,125 @@ const PurchaseList = () => {
                                                 <Tab>Status</Tab>
                                             </TabList>
                                             <TabPanel>
-                                                <table className="table table-bordered table-hover mb-0">
-                                                    <thead className="library-table-head">
-                                                    <tr>
-                                                        <th className="library-table-index" scope="col">#</th>
-                                                        <th scope="col">Sifariş adı</th>
-                                                        <th scope="col">Ödəniş növü</th>
-                                                        <th scope="col">Qiymət</th>
-                                                        <th scope="col">Say</th>
-                                                        <th scope="col"></th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {purchase.purchaseItem.map(({
-                                                                                    id,
-                                                                                    item,
-                                                                                    paymentType,
-                                                                                    qty,
-                                                                                    price
-                                                                                }, k) => {
-                                                        return (
-                                                            <tr key={k + 1}>
-                                                                <td className="table-index width-25">{k + 1}</td>
-                                                                <td>{item}</td>
-                                                                <td>{paymentType.name}</td>
-                                                                <td>{price}</td>
-                                                                <td>{qty}</td>
-                                                                <td className="table-actions text-right">
-                                                                    <Link
-                                                                        className='mr-3 btn-xs'
-                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
-                                                                    >
-                                                                        <i className='fas fa-edit fa-sm text-success'/>
-                                                                    </Link>
-                                                                    <span className='ml-2 btn-xs delete-button'>
-                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                            </span>
-                                                                </td>
+                                                {purchase.purchaseItem.length ? (
+                                                        <table className="table table-bordered table-hover mb-0">
+                                                            <thead className="library-table-head">
+                                                            <tr>
+                                                                <th className="library-table-index" scope="col">#</th>
+                                                                <th scope="col">Sifariş adı</th>
+                                                                <th scope="col">Ödəniş növü</th>
+                                                                <th scope="col">Qiymət</th>
+                                                                <th scope="col">Say</th>
+                                                                <th scope="col"></th>
                                                             </tr>
-                                                        )
-                                                    })}
-                                                    </tbody>
-                                                </table>
+                                                            </thead>
+                                                            <tbody>
+                                                            {purchase.purchaseItem.map(({
+                                                                                            id,
+                                                                                            item,
+                                                                                            paymentType,
+                                                                                            qty,
+                                                                                            price
+                                                                                        }, k) => {
+                                                                return (
+                                                                    <tr key={k + 1}>
+                                                                        <td className="table-index width-25">{k + 1}</td>
+                                                                        <td>{item}</td>
+                                                                        <td>{paymentType.name}</td>
+                                                                        <td>{price}</td>
+                                                                        <td>{qty}</td>
+                                                                        <td className="table-actions text-right">
+                                                                            <Link
+                                                                                className='mr-3 btn-xs'
+                                                                                to={`/purchaseInfo?edit=true&type=info&purchase_id=${purchase.id}&itemID=${id}`}
+                                                                            >
+                                                                                <i className='fas fa-edit fa-sm text-success'/>
+                                                                            </Link>
+                                                                            <span className='ml-2 btn-xs delete-button'
+                                                                            onClick={showDeleteModal.bind(this, 0, "purchase-items", id)}>
+                                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            })}
+                                                            </tbody>
+                                                        </table>)
+                                                    : <p className="text-center">Sifariş məhsulu daxil edilməyib.</p>}
                                             </TabPanel>
                                             <TabPanel>
-                                                <table className="table table-bordered table-hover mb-0">
-                                                    <thead className="library-table-head">
-                                                    <tr>
-                                                        <th className="library-table-index" scope="col">#</th>
-                                                        <th scope="col">Qeyd</th>
-                                                        <th scope="col"></th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {purchase.purchaseNote.map(({id, note}, k) => {
-                                                        return (
-                                                            <tr key={k}>
-                                                                <td className="table-index width-25">{k}</td>
-                                                                <td className="d-flex justify-content-between">
-                                                                    <span>{note}</span>
-                                                                </td>
-                                                                <td className="table-actions text-right">
-                                                                    <Link
-                                                                        className='mr-3 btn-xs'
-                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
-                                                                    >
-                                                                        <i className='fas fa-edit fa-sm text-success'/>
-                                                                    </Link>
-                                                                    <span className='ml-2 btn-xs delete-button'>
-                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                            </span>
-                                                                </td>
+                                                {purchase.purchaseNote.length ? (
+                                                        <table className="table table-bordered table-hover mb-0">
+                                                            <thead className="library-table-head">
+                                                            <tr>
+                                                                <th className="library-table-index" scope="col">#</th>
+                                                                <th scope="col">Qeyd</th>
+                                                                <th scope="col"></th>
                                                             </tr>
-                                                        )
-                                                    })}
-                                                    </tbody>
-                                                </table>
+                                                            </thead>
+                                                            <tbody>
+                                                            {purchase.purchaseNote.map(({id, note}, k) => {
+                                                                return (
+                                                                    <tr key={k}>
+                                                                        <td className="table-index width-25">{k}</td>
+                                                                        <td className="d-flex justify-content-between">
+                                                                            <span>{note}</span>
+                                                                        </td>
+                                                                        <td className="table-actions text-right">
+                                                                            <Link
+                                                                                className='mr-3 btn-xs'
+                                                                                to={`/purchaseInfo?edit=true&type=note&purchase_id=${purchase.id}&itemID=${id}`}
+                                                                            >
+                                                                                <i className='fas fa-edit fa-sm text-success'/>
+                                                                            </Link>
+                                                                            <span className='ml-2 btn-xs delete-button'
+                                                                                  onClick={showDeleteModal.bind(this, 0, "purchase-notes", id)}>
+                                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                )
+                                                            })}
+                                                            </tbody>
+                                                        </table>)
+                                                    : <p className="text-center">Sifariş qeydi daxil edilməyib.</p>}
                                             </TabPanel>
                                             <TabPanel>
-                                                <table className="table table-bordered table-hover mb-0">
-                                                    <thead className="library-table-head">
-                                                    <tr>
-                                                        <th className="library-table-index" scope="col">#</th>
-                                                        <th scope="col">Status</th>
-                                                        <th scope="col">Qeyd</th>
-                                                        <th scope="col"></th>
-                                                    </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                    {purchase.purchaseStatus.map(({id, note, statusType}, k) => {
-                                                        return (
-                                                            <tr key={k + 1}>
-                                                                <td className="table-index width-25">{k + 1}</td>
-                                                                <td>{statusType.name}</td>
-                                                                <td>{note}</td>
-                                                                <td className="table-actions text-right">
-                                                                    <Link
-                                                                        className='mr-3 btn-xs'
-                                                                        to={`/purchaseInfo?edit=true&type=info&id=${userID}&itemID=${id}`}
-                                                                    >
-                                                                        <i className='fas fa-edit fa-sm text-success'/>
-                                                                    </Link>
-                                                                    <span className='ml-2 btn-xs delete-button'>
-                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                            </span>
-                                                                </td>
-                                                            </tr>
-                                                        )
-                                                    })}
-                                                    </tbody>
-                                                </table>
+                                                {purchase.purchaseStatus.length ?
+                                                    (<table className="table table-bordered table-hover mb-0">
+                                                        <thead className="library-table-head">
+                                                        <tr>
+                                                            <th className="library-table-index" scope="col">#</th>
+                                                            <th scope="col">Status</th>
+                                                            <th scope="col">Qeyd</th>
+                                                            <th scope="col"></th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        {purchase.purchaseStatus.map(({id, note, statusType}, k) => {
+                                                            return (
+                                                                <tr key={k + 1}>
+                                                                    <td className="table-index width-25">{k + 1}</td>
+                                                                    <td>{statusType.name}</td>
+                                                                    <td>{note}</td>
+                                                                    <td className="table-actions text-right">
+                                                                        <Link
+                                                                            className='mr-3 btn-xs'
+                                                                            to={`/purchaseInfo?edit=true&type=status&purchase_id=${purchase.id}&itemID=${id}`}
+                                                                        >
+                                                                            <i className='fas fa-edit fa-sm text-success'/>
+                                                                        </Link>
+                                                                        <span className='ml-2 btn-xs delete-button'
+                                                                              onClick={showDeleteModal.bind(this, 0, "purchase-statuses", id)}>
+                                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                        </span>
+                                                                    </td>
+                                                                </tr>
+                                                            )
+                                                        })}
+                                                        </tbody>
+                                                    </table>)
+                                                    : <p className="text-center">Sifariş statusu daxil edilməyib.</p>}
                                             </TabPanel>
                                         </Tabs>
                                     </div>
@@ -313,6 +377,7 @@ const PurchaseList = () => {
                     </div>
                 </div>
                 }
+                <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle} hideModal={hideConfirmationModal} type={type} id={id} index={key} message={deleteMessage}  />
             </>
         )
     }

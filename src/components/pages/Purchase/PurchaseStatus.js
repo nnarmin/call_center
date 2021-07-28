@@ -3,22 +3,20 @@ import {Button} from "react-bootstrap";
 import {get, post} from "../../api/Api";
 import {useQuery} from "../../hooks/useQuery";
 import Loader from "react-loader-spinner";
+import {selectStyles} from "../../helpers/selectStyles";
+import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
+import Select from "react-select";
 
 const PurchaseStatus = () => {
     const query = useQuery();
-    const purchase_id = query.get("purchaseID");
+    const purchase_id = query.get("purchase_id");
     const type = query.get("type");
-    const item_id = query.get("itemID");
+    const item_id = query.get("id");
     const isEditable = query.get("edit");
     const [isFetchingData, setIsFetchingData] = useState(false);
+    const [statusTypeList, setStatusTypeList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
-    const [purchaseItem, setPurchaseItem] = useState([
-        {
-            "createdBy": '',
-            "createdAt": "",
-            "modifiedBy": "",
-            "modifiedAt": "",
-            "id": '',
+    const [purchaseStatus, setPurchaseStatus] = useState([{
             "purchase": {
                 "createdBy": '',
                 "createdAt": '',
@@ -26,45 +24,45 @@ const PurchaseStatus = () => {
                 "modifiedAt": '',
                 "id": purchase_id
             },
-            "note": ""
-        }
-    ])
+            "note": "",
+            "statusType": {
+                "id": '',
+                'name': ''
+            },
+            'id': ''
+        }]
+    )
 
     useEffect(() => {
-        if(isEditable && type==='note'){
-            getData();
-        }
-    }, []);
-
-    const getData = () => {
-        get(`/purchase-notes/${item_id}`).then((res) => {
-            console.log(res);
-            setPurchaseItem([res]);
+        get('/status-types').then((res) => {
             setIsFetchingData(false);
-        }).catch(() => {
+            setStatusTypeList(res?.content?.map((statusType) => ({
+                value: statusType.id,
+                label: `${statusType.name}`,
+            })));
+        }).catch((err) => {
             setIsFetchingData(false);
         })
-    }
+    }, []);
 
-    const addNewPurchaseItem = () => {
-        setPurchaseItem((prevState) => ([
-            ...prevState,
-            {
-                "purchase": {
-                    "id": purchase_id
-                },
-                "note": ""
-            }
-        ]))
-    }
 
     const handleInputChange = (i, type, value) => {
-        let alldata = [...purchaseItem];
-        alldata[i] = {
-            ...alldata[i],
-            [type]: value
+        let alldata = [...purchaseStatus];
+        if (type === 'select_status_type') {
+            alldata[i] = {
+                ...alldata[i],
+                statusType: {
+                    id: value.value,
+                    name: value.label
+                }
+            }
+        } else {
+            alldata[i] = {
+                ...alldata[i],
+                [type]: value
+            }
         }
-        setPurchaseItem(alldata);
+        setPurchaseStatus(alldata);
     }
 
     const deletePurchaseItemHandler = () => {
@@ -73,11 +71,12 @@ const PurchaseStatus = () => {
 
     const onUpdateHandler = (index, event) => {
         event.preventDefault();
+        console.log(purchaseStatus[index]);
         setIsLoading(true);
         if(isEditable){
 
         }else{
-            post('/purchase-notes', purchaseItem[index]).then((res) => {
+            post('/purchase-statuses', purchaseStatus[index]).then((res) => {
                 setIsLoading(false);
             }).catch(err => {
                 setIsLoading(false);
@@ -101,21 +100,30 @@ const PurchaseStatus = () => {
     return (
         <div>
             <ul className="list-group">
-                {purchaseItem.length && purchaseItem.map((item, i) => (
+                {purchaseStatus.length && purchaseStatus.map((item, i) => (
                     <li className="list-group-item" key={i}>
                         <div className="row">
-                            <div className="col-lg-8">
-                                <label className="mb-0 small ">Sifariş Qeydi</label>
+                            <div className="col-lg-4">
+                                <Select
+                                    styles={selectStyles}
+                                    options={statusTypeList}
+                                    components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
+                                    onChange={value => handleInputChange(i, "select_status_type", value)}
+                                    placeholder='Status növünü seçin...'
+                                />
+                            </div>
+                            <div className="col-lg-4">
                                 <input type="text" className="form-control"
+                                       placeholder="Status Qeydi"
                                        onChange={(e) => handleInputChange(i, 'note', e.target.value)} value={item.note}
-                                       required/>
+                                />
                             </div>
                             <div className="col-lg-1 d-flex align-items-center">
                                     <span className="mr-3 text-danger delete-button"
                                           onClick={deletePurchaseItemHandler}>
                                             <i className="fas fa-trash-alt fa-sm"/>
                                     </span>
-                                <span data-toggle="tooltip" title={!isEditable ? 'Əlavə et' : 'Düzəlişi təsdiqlə'}
+                                    <span data-toggle="tooltip" title={!isEditable ? 'Əlavə et' : 'Düzəlişi təsdiqlə'}
                                       onClick={onUpdateHandler.bind(this, i)}>
                                         <i className="fas fa-check-circle text-success ml-2"/>
                                     </span>
@@ -128,9 +136,8 @@ const PurchaseStatus = () => {
                 <Button type="button"
                         variant="success"
                         className="mr-2"
-                        onClick={addNewPurchaseItem}
                 >
-                    Yeni sifariş əlavə edin
+                    Yeni Status əlavə edin
                 </Button>
             </div>
         </div>

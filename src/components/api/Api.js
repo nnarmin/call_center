@@ -62,7 +62,7 @@ axiosInstance.interceptors.response.use((res) => {
 
     if (error?.response?.status) {
         store.addNotification({
-            title: error?.response?.data?.message || 'Xəta baş verdi!',
+            title: error?.response?.data?.message.includes("Cannot delete") ? 'Məlumatı silmək mümkün deyil!' : error?.response?.data?.message || 'Xəta baş verdi!',
             message: ' ',
             type: "danger",
             insert: "top",

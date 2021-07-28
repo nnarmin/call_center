@@ -47,25 +47,18 @@ const PurchaseItem = () => {
         }).catch((err) => {
             setIsFetchingData(false);
         })
-        if(isEditable){
+        if(isEditable && type==="info"){
             getData();
         }
     }, []);
 
     const getData = () => {
-        if(purchase_id){
-            get(`/purchase-items/search?purchaseId.equals=${purchase_id}&page=0&size=10`).then((res) => {
-                setPurchaseItem(res.content);
-                setIsFetchingData(false);
-            }).catch(err => setIsFetchingData(false))
-        }else{
-            get(`/purchase-items/${item_id}`).then((res) => {
-                setPurchaseItem([res]);
-                setIsFetchingData(false);
-            }).catch(() => {
-                setIsFetchingData(false);
-            })
-        }
+        get(`/purchase-items/${item_id}`).then((res) => {
+            setPurchaseItem([res]);
+            setIsFetchingData(false);
+        }).catch(() => {
+            setIsFetchingData(false);
+        })
     }
 
     const addNewPurchaseItem = () => {
@@ -148,7 +141,7 @@ const PurchaseItem = () => {
                                     styles={selectStyles}
                                     options={paymentTypeList}
                                     value ={item?.paymentType ? [{ value: item?.paymentType?.id, label: item?.paymentType?.name }] : ''}
-                                    components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növsü tapılmadı')}
+                                    components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
                                     onChange={value => handleInputChange(i, "select_purchase_type", value)}
                                     placeholder='Ödəniş növünü seçin...'
                                 />
