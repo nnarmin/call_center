@@ -3,6 +3,7 @@ import {Button} from "react-bootstrap";
 import {get, post} from "../../api/Api";
 import {useQuery} from "../../hooks/useQuery";
 import Loader from "react-loader-spinner";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const PurchaseNote = () => {
     const query = useQuery();
@@ -31,28 +32,21 @@ const PurchaseNote = () => {
     ])
 
     useEffect(() => {
-        if(isEditable){
+        if (isEditable && type==="note") {
             getData();
         }
     }, []);
 
     const getData = () => {
-        if(purchase_id){
-            get(`/purchase-notes/search?purchaseId.equals=${purchase_id}&page=0&size=10`).then((res) => {
-                setPurchaseNote(res.content);
-                setIsFetchingData(false);
-            }).catch(err => setIsFetchingData(false))
-        }else{
-            get(`/purchase-notes/${item_id}`).then((res) => {
-                setPurchaseNote([res]);
-                setIsFetchingData(false);
-            }).catch(() => {
-                setIsFetchingData(false);
-            })
-        }
+        get(`/purchase-notes/${item_id}`).then((res) => {
+            setPurchaseNote([res]);
+            setIsFetchingData(false);
+        }).catch(() => {
+            setIsFetchingData(false);
+        })
     }
 
-    const addNewPurchaseItem = () => {
+    const addNewPurchaseNote = () => {
         setPurchaseNote((prevState) => ([
             ...prevState,
             {
@@ -80,9 +74,9 @@ const PurchaseNote = () => {
     const onUpdateHandler = (index, event) => {
         event.preventDefault();
         setIsLoading(true);
-        if(isEditable){
+        if (isEditable) {
 
-        }else{
+        } else {
             post('/purchase-notes', purchaseNote[index]).then((res) => {
                 setIsLoading(false);
             }).catch(err => {
@@ -126,6 +120,13 @@ const PurchaseNote = () => {
                                         <i className="fas fa-check-circle text-success ml-2"/>
                                     </span>
                             </div>
+                            {item.modifiedBy &&
+                            <div className="col-12 mt-2">
+                                    <span className="note note-info mb-0 mt-1 note-custom-style">
+                                        Sonuncu düzəliş <strong>{item.modifiedBy}</strong> tərəfindən <strong>{formattedDate(item.modifiedAt)}</strong> edilib.
+                                    </span>
+                            </div>
+                            }
                         </div>
                     </li>
                 ))}
@@ -134,11 +135,11 @@ const PurchaseNote = () => {
                 <Button type="button"
                         variant="success"
                         className="mr-2"
-                        onClick={addNewPurchaseItem}
+                        onClick={addNewPurchaseNote}
                 >
                     Yeni sifariş əlavə edin
                 </Button>
-            </div> }
+            </div>}
         </div>
     )
 }

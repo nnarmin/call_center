@@ -17,7 +17,7 @@ const CustomerAddEdit = () => {
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isDIsabled, setIsDIsabled] = useState(true);
     const [formStep, setFormStep] = useState(1);
-    const [activeTab, setActiveTab] = useState('userInfo');
+    const [activeTab, setActiveTab] = useState('');
     const [userState, setUserState] = useState({
         name: '',
         surname: '',
@@ -59,11 +59,13 @@ const CustomerAddEdit = () => {
     })
 
     useEffect(() => {
-        let unmounted = false;
         if(type){
             setActiveTab(type);
             console.log(activeTab)
+        }else{
+            setActiveTab('userInfo')
         }
+
         if (isEditable) {
             setIsFetchingData(true);
             get(`/customers/${userId}`).then(res => {
@@ -84,9 +86,6 @@ const CustomerAddEdit = () => {
                 setIsFetchingData(false);
             })
         }
-        return () => {
-            unmounted = true
-        };
     }, [isEditable, userId, isDIsabled, type, activeTab]);
 
     const getData = (type) => {
@@ -254,7 +253,7 @@ const CustomerAddEdit = () => {
     return (
         <Card>
             <Card.Body>
-                <Tabs defaultActiveKey={activeTab} id="uncontrolled-tab-example" className="mb-3">
+                {activeTab && <Tabs defaultActiveKey={activeTab} id="uncontrolled-tab-example" className="mb-3">
                     <Tab eventKey="userInfo" title="Müştəri" disabled={type && true}>
                         <div className="row">
                             <div className="col-md-6">
@@ -303,7 +302,8 @@ const CustomerAddEdit = () => {
                             </Button>
                         </div>
                     </Tab>
-                    <Tab eventKey="contact" title="Əlaqə Məlumatları" disabled={type==="contact" ? false : isDIsabled}>
+                    <Tab eventKey="contact" title="Əlaqə Məlumatları"
+                         disabled={type === "contact" ? false : isDIsabled}>
                         {userState.contacts?.length
                             ? userState.contacts.map((contactInfo, i) => (
                                 <div className="row" key={i}>
@@ -320,7 +320,7 @@ const CustomerAddEdit = () => {
                                                         <i className="fas fa-trash-alt fa-sm"/>
                                                     </span>
                                             <div className="cursor-pointer"
-                                                onClick={onUpdateHandler.bind(this, contactInfo.id, i, "contact")}>
+                                                 onClick={onUpdateHandler.bind(this, contactInfo.id, i, "contact")}>
                                                 <i className="fas fa-check-circle text-success ml-2"/>
                                             </div>
                                         </div>
@@ -355,7 +355,7 @@ const CustomerAddEdit = () => {
                             }
                         </div>
                     </Tab>
-                    <Tab eventKey="address" title="Ünvan" disabled={type==="address" ? false : isDIsabled}>
+                    <Tab eventKey="address" title="Ünvan" disabled={type === "address" ? false : isDIsabled}>
                         {userState.addresses?.length
                             ? userState.addresses.map((addressInfo, i) => (
                                 <div className="row" key={i}>
@@ -372,7 +372,7 @@ const CustomerAddEdit = () => {
                                                         <i className="fas fa-trash-alt fa-sm"/>
                                                     </span>
                                             <div className="cursor-pointer"
-                                                onClick={onUpdateHandler.bind(this, addressInfo.id, i, "address")}>
+                                                 onClick={onUpdateHandler.bind(this, addressInfo.id, i, "address")}>
                                                 <i className="fas fa-check-circle text-success ml-2"/>
                                             </div>
                                         </div>
@@ -407,7 +407,7 @@ const CustomerAddEdit = () => {
                             }
                         </div>
                     </Tab>
-                    <Tab eventKey="note" title="Qeydlər" disabled={type==="note" ? false : isDIsabled}>
+                    <Tab eventKey="note" title="Qeydlər" disabled={type === "note" ? false : isDIsabled}>
                         {userState.notes?.length
                             ? userState.notes.map((noteInfo, i) => (
                                 <div className="row" key={i}>
@@ -424,7 +424,7 @@ const CustomerAddEdit = () => {
                                                     <i className="fas fa-trash-alt fa-sm"/>
                                                 </span>
                                             <div className="cursor-pointer"
-                                                onClick={onUpdateHandler.bind(this, noteInfo.id, i, "note")}>
+                                                 onClick={onUpdateHandler.bind(this, noteInfo.id, i, "note")}>
                                                 <i className="fas fa-check-circle text-success"/>
                                             </div>
                                         </div>
@@ -459,6 +459,7 @@ const CustomerAddEdit = () => {
 
                     </Tab>
                 </Tabs>
+                }
             </Card.Body>
         </Card>
     )

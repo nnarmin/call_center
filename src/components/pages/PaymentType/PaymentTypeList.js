@@ -43,7 +43,7 @@ const PaymentList = (props) => {
         remove(`/payment-types/${id}`).then((res) => {
             getResponseData();
             setIsFetchingData(false)
-        }).catch((error)=>{
+        }).catch((error) => {
             setIsFetchingData(false)
         })
     };
@@ -62,34 +62,36 @@ const PaymentList = (props) => {
 
     return (
         <>
-            <Table bordered>
-                <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Ödəniş Növü</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {res?.content && res.content.map(({id, name}, i) => (
-                    <tr key={id}>
-                        <td className='table-index'>{+i + rowNums}</td>
-                        <td>{name}</td>
-                        <td className='table-actions text-right'>
-                            <Link
-                                className='mr-3 btn-xs'
-                                to={`payment-methods/add?edit=true&id=${id}`}
-                            >
-                                <i className='fas fa-edit fa-sm text-success'/>
-                            </Link>
-                            <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
+            <div className="table-responsive">
+                <Table bordered>
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Ödəniş Növü</th>
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {res?.content && res.content.map(({id, name}, i) => (
+                        <tr key={id}>
+                            <td className='table-index'>{+i + rowNums}</td>
+                            <td>{name}</td>
+                            <td className='table-actions text-right'>
+                                <Link
+                                    className='mr-3 btn-xs'
+                                    to={`payment-methods/add?edit=true&id=${id}`}
+                                >
+                                    <i className='fas fa-edit fa-sm text-success'/>
+                                </Link>
+                                <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
                                 <i className="fas fa-trash-alt fa-sm text-danger"/>
                             </span>
-                        </td>
-                    </tr>
-                ))}
-                </tbody>
-            </Table>
+                            </td>
+                        </tr>
+                    ))}
+                    </tbody>
+                </Table>
+            </div>
             <div className='row pt-2'>
                 <div className='col-md-12'>
                     <nav aria-label='Page navigation example p-0'>

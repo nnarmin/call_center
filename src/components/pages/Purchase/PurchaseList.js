@@ -52,19 +52,25 @@ const PurchaseList = () => {
                     resNote.push(...result.content);
                     console.log("note", result.content)
                     setIsFetchingItemData(false);
-                }).catch(err => {console.log(err)});
+                }).catch(err => {
+                    console.log(err)
+                });
 
                 await get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resItem.push(...result.content);
                     console.log("item", result.content)
                     setIsFetchingNoteData(false);
-                }).catch(err => {console.log(err)})
+                }).catch(err => {
+                    console.log(err)
+                })
 
                 await get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
                     resStatus.push(...result.content)
                     console.log("status", result.content)
                     setIsFetchingStatusData(false);
-                }).catch(err => {console.log(err)});
+                }).catch(err => {
+                    console.log(err)
+                });
 
                 console.log("state", {
                     createdBy: purchase.createdBy,
@@ -221,124 +227,143 @@ const PurchaseList = () => {
                                                 <Tab>Status</Tab>
                                             </TabList>
                                             <TabPanel>
+                                                <div className="text-right"><Link
+                                                    to={`/purchase/add?type=info&purchase_id=${purchase.id}`}
+                                                    className="btn btn-success mb-2">Yeni Məhsul</Link></div>
                                                 {purchase.purchaseItem.length ? (
-                                                        <table className="table table-bordered table-hover mb-0">
-                                                            <thead className="library-table-head">
-                                                            <tr>
-                                                                <th className="library-table-index" scope="col">#</th>
-                                                                <th scope="col">Sifariş adı</th>
-                                                                <th scope="col">Ödəniş növü</th>
-                                                                <th scope="col">Qiymət</th>
-                                                                <th scope="col">Say</th>
-                                                                <th scope="col"></th>
-                                                            </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                            {purchase.purchaseItem.map(({
-                                                                                            id,
-                                                                                            item,
-                                                                                            paymentType,
-                                                                                            qty,
-                                                                                            price
-                                                                                        }, k) => {
-                                                                return (
-                                                                    <tr key={k + 1}>
-                                                                        <td className="table-index width-25">{k + 1}</td>
-                                                                        <td>{item}</td>
-                                                                        <td>{paymentType.name}</td>
-                                                                        <td>{price}</td>
-                                                                        <td>{qty}</td>
-                                                                        <td className="table-actions text-right">
-                                                                            <Link
-                                                                                className='mr-3 btn-xs'
-                                                                                to={`/purchase/add?edit=true&type=info&purchase_id=${purchase.id}&id=${id}`}
-                                                                            >
-                                                                                <i className='fas fa-edit fa-sm text-success'/>
-                                                                            </Link>
-                                                                            <span className='ml-2 btn-xs delete-button'
-                                                                            onClick={showDeleteModal.bind(this, 0, "purchase-items", id)}>
-                                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                                            </span>
-                                                                        </td>
-                                                                    </tr>
-                                                                )
-                                                            })}
-                                                            </tbody>
-                                                        </table>)
+                                                        <div className="table-responsive">
+                                                            <table className="table table-bordered table-hover mb-0">
+                                                                <thead className="library-table-head">
+                                                                <tr>
+                                                                    <th className="library-table-index" scope="col">#</th>
+                                                                    <th scope="col">Sifariş adı</th>
+                                                                    <th scope="col">Ödəniş növü</th>
+                                                                    <th scope="col">Qiymət</th>
+                                                                    <th scope="col">Say</th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {purchase.purchaseItem.map(({
+                                                                                                id,
+                                                                                                item,
+                                                                                                paymentType,
+                                                                                                qty,
+                                                                                                price
+                                                                                            }, k) => {
+                                                                    return (
+                                                                        <tr key={k + 1}>
+                                                                            <td className="table-index width-25">{k + 1}</td>
+                                                                            <td>{item}</td>
+                                                                            <td>{paymentType.name}</td>
+                                                                            <td>{price}</td>
+                                                                            <td>{qty}</td>
+                                                                            <td className="table-actions text-right">
+                                                                                <Link
+                                                                                    className='mr-3 btn-xs'
+                                                                                    to={`/purchase/add?edit=true&type=info&purchase_id=${purchase.id}&id=${id}`}
+                                                                                >
+                                                                                    <i className='fas fa-edit fa-sm text-success'/>
+                                                                                </Link>
+                                                                                <span className='ml-2 btn-xs delete-button'
+                                                                                      onClick={showDeleteModal.bind(this, 0, "purchase-items", id)}>
+                                                                                    <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                                </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>)
                                                     : <p className="text-center">Sifariş məhsulu daxil edilməyib.</p>}
                                             </TabPanel>
                                             <TabPanel>
+                                                <div className="text-right"><Link
+                                                    to={`/purchase/add?type=note&purchase_id=${purchase.id}`}
+                                                    className="btn btn-success mb-2">Yeni Qeyd</Link></div>
                                                 {purchase.purchaseNote.length ? (
+                                                        <div className="table-responsive">
+                                                            <table className="table table-bordered table-hover mb-0">
+                                                                <thead className="library-table-head">
+                                                                <tr>
+                                                                    <th className="library-table-index" scope="col">#</th>
+                                                                    <th scope="col">Qeyd</th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                {purchase.purchaseNote.map(({id, note}, k) => {
+                                                                    return (
+                                                                        <tr key={k}>
+                                                                            <td className="table-index width-25">{k}</td>
+                                                                            <td className="d-flex justify-content-between">
+                                                                                <span>{note}</span>
+                                                                            </td>
+                                                                            <td className="table-actions text-right">
+                                                                                <Link
+                                                                                    className='mr-3 btn-xs'
+                                                                                    to={`/purchase/add?edit=true&type=note&purchase_id=${purchase.id}&id=${id}`}
+                                                                                >
+                                                                                    <i className='fas fa-edit fa-sm text-success'/>
+                                                                                </Link>
+                                                                                <span className='ml-2 btn-xs delete-button'
+                                                                                      onClick={showDeleteModal.bind(this, 0, "purchase-notes", id)}>
+                                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                            </span>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )
+                                                                })}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>)
+                                                    : <p className="text-center">Sifariş qeydi daxil edilməyib.</p>}
+                                            </TabPanel>
+                                            <TabPanel>
+                                                <div className="text-right"><Link
+                                                    to={`/purchase/add?type=status&purchase_id=${purchase.id}`}
+                                                    className="btn btn-success mb-2">Yeni Status</Link></div>
+                                                {purchase.purchaseStatus.length ?
+                                                    (<div className="table-responsive">
                                                         <table className="table table-bordered table-hover mb-0">
                                                             <thead className="library-table-head">
                                                             <tr>
                                                                 <th className="library-table-index" scope="col">#</th>
+                                                                <th scope="col">Status</th>
                                                                 <th scope="col">Qeyd</th>
                                                                 <th scope="col"></th>
                                                             </tr>
                                                             </thead>
                                                             <tbody>
-                                                            {purchase.purchaseNote.map(({id, note}, k) => {
+                                                            {purchase.purchaseStatus.map(({
+                                                                                              id,
+                                                                                              note,
+                                                                                              statusType
+                                                                                          }, k) => {
                                                                 return (
-                                                                    <tr key={k}>
-                                                                        <td className="table-index width-25">{k}</td>
-                                                                        <td className="d-flex justify-content-between">
-                                                                            <span>{note}</span>
-                                                                        </td>
+                                                                    <tr key={k + 1}>
+                                                                        <td className="table-index width-25">{k + 1}</td>
+                                                                        <td>{statusType.name}</td>
+                                                                        <td>{note}</td>
                                                                         <td className="table-actions text-right">
                                                                             <Link
                                                                                 className='mr-3 btn-xs'
-                                                                                to={`/purchase/add?edit=true&type=note&purchase_id=${purchase.id}&id=${id}`}
+                                                                                to={`/purchase/add?edit=true&type=status&purchase_id=${purchase.id}&id=${id}`}
                                                                             >
                                                                                 <i className='fas fa-edit fa-sm text-success'/>
                                                                             </Link>
                                                                             <span className='ml-2 btn-xs delete-button'
-                                                                                  onClick={showDeleteModal.bind(this, 0, "purchase-notes", id)}>
-                                                                                <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                                            </span>
+                                                                                  onClick={showDeleteModal.bind(this, 0, "purchase-statuses", id)}>
+                                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
+                                                                        </span>
                                                                         </td>
                                                                     </tr>
                                                                 )
                                                             })}
                                                             </tbody>
-                                                        </table>)
-                                                    : <p className="text-center">Sifariş qeydi daxil edilməyib.</p>}
-                                            </TabPanel>
-                                            <TabPanel>
-                                                {purchase.purchaseStatus.length ?
-                                                    (<table className="table table-bordered table-hover mb-0">
-                                                        <thead className="library-table-head">
-                                                        <tr>
-                                                            <th className="library-table-index" scope="col">#</th>
-                                                            <th scope="col">Status</th>
-                                                            <th scope="col">Qeyd</th>
-                                                            <th scope="col"></th>
-                                                        </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                        {purchase.purchaseStatus.map(({id, note, statusType}, k) => {
-                                                            return (
-                                                                <tr key={k + 1}>
-                                                                    <td className="table-index width-25">{k + 1}</td>
-                                                                    <td>{statusType.name}</td>
-                                                                    <td>{note}</td>
-                                                                    <td className="table-actions text-right">
-                                                                        <Link
-                                                                            className='mr-3 btn-xs'
-                                                                            to={`/purchase/add?edit=true&type=status&purchase_id=${purchase.id}&id=${id}`}
-                                                                        >
-                                                                            <i className='fas fa-edit fa-sm text-success'/>
-                                                                        </Link>
-                                                                        <span className='ml-2 btn-xs delete-button'
-                                                                              onClick={showDeleteModal.bind(this, 0, "purchase-statuses", id)}>
-                                                                            <i className="fas fa-trash-alt fa-sm text-danger"/>
-                                                                        </span>
-                                                                    </td>
-                                                                </tr>
-                                                            )
-                                                        })}
-                                                        </tbody>
-                                                    </table>)
+                                                        </table>
+                                                    </div>)
                                                     : <p className="text-center">Sifariş statusu daxil edilməyib.</p>}
                                             </TabPanel>
                                         </Tabs>
@@ -377,7 +402,9 @@ const PurchaseList = () => {
                     </div>
                 </div>
                 }
-                <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle} hideModal={hideConfirmationModal} type={type} id={id} index={key} message={deleteMessage}  />
+                <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle}
+                                    hideModal={hideConfirmationModal} type={type} id={id} index={key}
+                                    message={deleteMessage}/>
             </>
         )
     }

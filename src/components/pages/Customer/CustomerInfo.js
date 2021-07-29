@@ -67,7 +67,6 @@ const CustomerInfo = () => {
     }
 
     const deleteHandle = (key, type, id) => {
-        console.log(key, type, id)
         let data = [...state[type]];
         remove(`customer-${type}/${id}`).then(res => {
             setIsFetchingData(false);

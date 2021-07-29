@@ -7,6 +7,7 @@ import {selectStyles} from "../../helpers/selectStyles";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import Select from "react-select";
 import DeleteConfirmation from "../../others/ConfirmationModal";
+import {formattedDate} from "../../helpers/formattedDate";
 
 const PurchaseStatus = () => {
     const query = useQuery();
@@ -21,12 +22,12 @@ const PurchaseStatus = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [purchaseStatus, setPurchaseStatus] = useState([{
             "purchase": {
-                "createdBy": '',
-                "createdAt": '',
-                "modifiedBy": '',
-                "modifiedAt": '',
                 "id": purchase_id
             },
+            "createdAt": '',
+            "createdBy": '',
+            "modifiedAt": '',
+            "modifiedBy": '',
             "note": "",
             "statusType": {
                 "id": '',
@@ -158,6 +159,13 @@ const PurchaseStatus = () => {
                                         <i className="fas fa-check-circle text-success ml-2"/>
                                     </span>
                             </div>
+                            {item.modifiedBy &&
+                            <div className="col-12 mt-2">
+                                    <span className="note note-info mb-0 mt-1 note-custom-style">
+                                        Sonuncu düzəliş <strong>{item.modifiedBy}</strong> tərəfindən <strong>{formattedDate(item.modifiedAt)}</strong> edilib.
+                                    </span>
+                            </div>
+                            }
                         </div>
                     </li>
                 ))}
