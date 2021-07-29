@@ -24,13 +24,13 @@ const PurchaseAddEdit = () => {
         <Card>
             <Card.Body>
                 <Tabs defaultActiveKey={activeTab} className="mb-3">
-                    <Tab eventKey="purchaseInfo" title="Sifariş Məhsulu">
+                    <Tab eventKey="purchaseInfo" title="Sifariş Məhsulu" disabled={type==="purchaseInfo" ? false : isDisabled}>
                         <PurchaseItem/>
                     </Tab>
-                    <Tab eventKey="note" title="Sifariş Qeydləri">
+                    <Tab eventKey="note" title="Sifariş Qeydləri" disabled={type==="note" ? false : isDisabled}>
                         <PurchaseNote/>
                     </Tab>
-                    <Tab eventKey="status" title="Sifariş Statusu">
+                    <Tab eventKey="status" title="Sifariş Statusu" disabled={type==="status" ? false : isDisabled}>
                         <PurchaseStatus/>
                     </Tab>
                 </Tabs>

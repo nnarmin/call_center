@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Button} from "react-bootstrap";
-import {get, post} from "../../api/Api";
+import {get, post, put} from "../../api/Api";
 import {useQuery} from "../../hooks/useQuery";
 import Loader from "react-loader-spinner";
 import {selectStyles} from "../../helpers/selectStyles";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import Select from "react-select";
+import DeleteConfirmation from "../../components/ConfirmationModal";
 
 const PurchaseStatus = () => {
     const query = useQuery();
@@ -13,6 +14,8 @@ const PurchaseStatus = () => {
     const type = query.get("type");
     const item_id = query.get("id");
     const isEditable = query.get("edit");
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState(null);
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [statusTypeList, setStatusTypeList] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,9 +45,22 @@ const PurchaseStatus = () => {
             })));
         }).catch((err) => {
             setIsFetchingData(false);
-        })
+        });
+
+        if(isEditable && type==="status"){
+            getData();
+        }
+
     }, []);
 
+    const getData = () => {
+        get(`/purchase-statuses/${item_id}`).then((res) => {
+            setPurchaseStatus([res]);
+            setIsFetchingData(false);
+        }).catch(() => {
+            setIsFetchingData(false);
+        })
+    }
 
     const handleInputChange = (i, type, value) => {
         let alldata = [...purchaseStatus];
@@ -65,16 +81,29 @@ const PurchaseStatus = () => {
         setPurchaseStatus(alldata);
     }
 
+    const showDeleteModal = (key, type, id) => {
+        setDeleteMessage(`Məlumatı silmək istədiyinizdən əminsiniz?`);
+        setDisplayConfirmationModal(true);
+    };
+
+    // Hide the modal
+    const hideConfirmationModal = () => {
+        setDisplayConfirmationModal(false);
+    };
+
     const deletePurchaseItemHandler = () => {
 
     }
 
     const onUpdateHandler = (index, event) => {
         event.preventDefault();
-        console.log(purchaseStatus[index]);
         setIsLoading(true);
         if(isEditable){
-
+            put(`/purchase-statuses/${item_id}`, purchaseStatus[index]).then((res) => {
+                setIsLoading(false);
+            }).catch(err => {
+                setIsLoading(false);
+            })
         }else{
             post('/purchase-statuses', purchaseStatus[index]).then((res) => {
                 setIsLoading(false);
@@ -107,6 +136,7 @@ const PurchaseStatus = () => {
                                 <Select
                                     styles={selectStyles}
                                     options={statusTypeList}
+                                    value ={item?.statusType ? [{ value: item?.statusType?.id, label: item?.statusType?.name }] : ''}
                                     components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
                                     onChange={value => handleInputChange(i, "select_status_type", value)}
                                     placeholder='Status növünü seçin...'
@@ -132,14 +162,15 @@ const PurchaseStatus = () => {
                     </li>
                 ))}
             </ul>
-            <div className="d-flex justify-content-end align-items-center mt-3">
+            {!isEditable && <div className="d-flex justify-content-end align-items-center mt-3">
                 <Button type="button"
                         variant="success"
                         className="mr-2"
                 >
                     Yeni Status əlavə edin
                 </Button>
-            </div>
+            </div> }
+            <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deletePurchaseItemHandler} hideModal={hideConfirmationModal} type={type} id={item_id} index="0" message={deleteMessage}  />
         </div>
     )
 }

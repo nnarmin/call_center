@@ -184,7 +184,7 @@ const PurchaseItem = () => {
                     </li>
                 ))}
             </ul>
-            <div className="d-flex justify-content-end align-items-center mt-3">
+            {!isEditable && <div className="d-flex justify-content-end align-items-center mt-3">
                 <Button type="button"
                         variant="success"
                         className="mr-2"
@@ -192,7 +192,7 @@ const PurchaseItem = () => {
                 >
                     Yeni sifariş əlavə edin
                 </Button>
-            </div>
+            </div> }
         </div>
     )
 }
