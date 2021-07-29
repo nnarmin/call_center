@@ -6,7 +6,7 @@ import Loader from "react-loader-spinner";
 import {selectStyles} from "../../helpers/selectStyles";
 import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 import Select from "react-select";
-import DeleteConfirmation from "../../components/ConfirmationModal";
+import DeleteConfirmation from "../../others/ConfirmationModal";
 
 const PurchaseStatus = () => {
     const query = useQuery();

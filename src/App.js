@@ -66,7 +66,7 @@ function App() {
                         <PrivateRoute path='/customerInfo/:customerID' component={CustomerInfo}/>
                         <PrivateRoute path='/customer/add' component={CustomerAddEdit}/>
                         <PrivateRoute path='/addPurchase/:customerID' component={AddPurchase}/>
-                        <PrivateRoute path='/purchaseInfo' component={PurchaseAddEdit}/>
+                        <PrivateRoute path='/purchase/add' component={PurchaseAddEdit}/>
                         <PrivateRoute path='/purchase/view' component={PurchaseDetail}/>
                     </Switch>
                 </Layout>

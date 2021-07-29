@@ -46,7 +46,7 @@ const AddPurchase = () => {
             }
         };
         post('/purchases', purchaseData).then((res) => {
-            history.push(`/purchaseInfo?id=${userID}&purchase_id=${res.id}`);
+            history.push(`/purchase/add?id=${userID}&purchase_id=${res.id}`);
             setIsLoading(false);
         }).catch((err) => {
             setIsLoading(false);

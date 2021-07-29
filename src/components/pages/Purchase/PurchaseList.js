@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
 import {get, remove} from "../../api/Api";
 import {formattedDate} from "../../helpers/formattedDate";
-import DeleteConfirmation from "../../components/ConfirmationModal";
+import DeleteConfirmation from "../../others/ConfirmationModal";
 import {
     Tab, Tabs, TabList, TabPanel,
 } from 'react-tabs';
@@ -251,7 +251,7 @@ const PurchaseList = () => {
                                                                         <td className="table-actions text-right">
                                                                             <Link
                                                                                 className='mr-3 btn-xs'
-                                                                                to={`/purchaseInfo?edit=true&type=info&purchase_id=${purchase.id}&id=${id}`}
+                                                                                to={`/purchase/add?edit=true&type=info&purchase_id=${purchase.id}&id=${id}`}
                                                                             >
                                                                                 <i className='fas fa-edit fa-sm text-success'/>
                                                                             </Link>
@@ -288,7 +288,7 @@ const PurchaseList = () => {
                                                                         <td className="table-actions text-right">
                                                                             <Link
                                                                                 className='mr-3 btn-xs'
-                                                                                to={`/purchaseInfo?edit=true&type=note&purchase_id=${purchase.id}&id=${id}`}
+                                                                                to={`/purchase/add?edit=true&type=note&purchase_id=${purchase.id}&id=${id}`}
                                                                             >
                                                                                 <i className='fas fa-edit fa-sm text-success'/>
                                                                             </Link>
@@ -325,7 +325,7 @@ const PurchaseList = () => {
                                                                     <td className="table-actions text-right">
                                                                         <Link
                                                                             className='mr-3 btn-xs'
-                                                                            to={`/purchaseInfo?edit=true&type=status&purchase_id=${purchase.id}&id=${id}`}
+                                                                            to={`/purchase/add?edit=true&type=status&purchase_id=${purchase.id}&id=${id}`}
                                                                         >
                                                                             <i className='fas fa-edit fa-sm text-success'/>
                                                                         </Link>

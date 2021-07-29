@@ -10,7 +10,7 @@ const PurchaseAddEdit = () => {
     const type = query.get('type');
     const isEditable = query.get('edit');
     const [isDisabled, setIsDisabled] = useState(true);
-    const [activeTab, setActiveTab] = useState('purchaseInfo');
+    const [activeTab, setActiveTab] = useState('info');
 
     useEffect(() => {
         alert(type)
@@ -24,7 +24,7 @@ const PurchaseAddEdit = () => {
         <Card>
             <Card.Body>
                 <Tabs defaultActiveKey={activeTab} className="mb-3">
-                    <Tab eventKey="purchaseInfo" title="Sifariş Məhsulu" disabled={type==="purchaseInfo" ? false : isDisabled}>
+                    <Tab eventKey="info" title="Sifariş Məhsulu" disabled={type==="info" ? false : isDisabled}>
                         <PurchaseItem/>
                     </Tab>
                     <Tab eventKey="note" title="Sifariş Qeydləri" disabled={type==="note" ? false : isDisabled}>

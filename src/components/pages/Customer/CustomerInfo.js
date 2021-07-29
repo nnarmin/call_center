@@ -4,7 +4,7 @@ import {get, remove} from "../../api/Api";
 import {Card, Tabs, Tab} from "react-bootstrap";
 import Loader from "react-loader-spinner";
 import PurchaseList from "../Purchase/PurchaseList";
-import DeleteConfirmation from "../../components/ConfirmationModal";
+import DeleteConfirmation from "../../others/ConfirmationModal";
 
 const CustomerInfo = () => {
     const history = useHistory();

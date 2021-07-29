@@ -35,6 +35,10 @@ const TemplateDetail = () => {
         setIsLoading(false);
     }, [history, purchaseId]);
 
+    const deleteHandle = () => {
+
+    }
+
     return (
         <Card style={{ minHeight: 300 }}>
             <Card.Header className='my-3'>
@@ -91,7 +95,7 @@ const TemplateDetail = () => {
                                                 <td className="table-actions text-right">
                                                     <Link
                                                         className='mr-3 btn-xs'
-                                                        to={`/purchaseInfo?edit=true&type=info&id=${id}`}
+                                                        to={`/purchase/add?edit=true&type=info&id=${id}`}
                                                     >
                                                         <i className='fas fa-edit fa-sm text-success'/>
                                                     </Link>
@@ -128,7 +132,7 @@ const TemplateDetail = () => {
                                                 <td className="table-actions text-right">
                                                     <Link
                                                         className='mr-3 btn-xs'
-                                                        to={`/purchaseInfo?edit=true&type=note&id=${id}`}
+                                                        to={`/purchase/add?edit=true&type=note&id=${id}`}
                                                     >
                                                         <i className='fas fa-edit fa-sm text-success'/>
                                                     </Link>
@@ -165,7 +169,7 @@ const TemplateDetail = () => {
                                                 <td className="table-actions text-right">
                                                     <Link
                                                         className='mr-3 btn-xs'
-                                                        to={`/purchaseInfo?edit=true&type=status&id=${id}`}
+                                                        to={`/purchase/add?edit=true&type=status&id=${id}`}
                                                     >
                                                         <i className='fas fa-edit fa-sm text-success'/>
                                                     </Link>
