@@ -138,7 +138,7 @@ const PurchaseStatus = () => {
                                     styles={selectStyles}
                                     options={statusTypeList}
                                     value ={item?.statusType ? [{ value: item?.statusType?.id, label: item?.statusType?.name }] : ''}
-                                    components={(props) => NoOptionsMessage(props, 'Status növü tapılmadı')}
+                                    components={(props) => NoOptionsMessage(props, 'Status növü tapılmadı.')}
                                     onChange={value => handleInputChange(i, "select_status_type", value)}
                                     placeholder='Status növünü seçin...'
                                 />
