@@ -5,11 +5,18 @@ import {get, remove} from '../../api/Api';
 import {Table} from "react-bootstrap";
 import Loader from "react-loader-spinner";
 import {useQuery} from "../../hooks/useQuery";
+import DeleteConfirmation from "../../others/ConfirmationModal";
 
 const SocialList = () => {
     const history = useHistory();
     let query = useQuery();
     const currentPage = query.get("page") || 0;
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState(null);
+    const [type, setType] = useState('');
+    const [key, setKey] = useState('');
+    const [id, setId] = useState('');
+
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [page, setPage] = useState(currentPage);
     const [rowNums, setRowNums] = useState(0);
@@ -39,11 +46,29 @@ const SocialList = () => {
         getResponseData();
     }, [page]);
 
-    const deleteHandle = (id) => {
-        remove(`/social-types/${id}`).then((res) => {
-            getResponseData();
-        })
+
+    const showDeleteModal = (key, type, id) => {
+        setType(type);
+        setId(id);
+        setKey(key);
+        setDeleteMessage(`Məlumatı silmək istədiyinizdən əminsiniz?`);
+        setDisplayConfirmationModal(true);
     };
+
+    // Hide the modal
+    const hideConfirmationModal = () => {
+        setDisplayConfirmationModal(false);
+    };
+
+    const deleteHandle = (key, type, id) => {
+        remove(`${type}/${id}`).then(res => {
+            getResponseData();
+            setIsFetchingData(false)
+        }).catch(err => {
+            setIsFetchingData(false);
+        });
+        setDisplayConfirmationModal(false);
+    }
 
     if (isFetchingData) {
         return (
@@ -64,7 +89,7 @@ const SocialList = () => {
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Status Növü</th>
+                        <th>Sosial Şəbəkə Növü</th>
                         <th></th>
                     </tr>
                     </thead>
@@ -80,7 +105,8 @@ const SocialList = () => {
                                 >
                                     <i className='fas fa-edit fa-sm text-success'/>
                                 </Link>
-                                <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
+                                <span className='ml-2 btn-xs delete-button'
+                                      onClick={showDeleteModal.bind(this, 0, "social-types", id)}>
                                     <i className="fas fa-trash-alt fa-sm text-danger"/>
                                 </span>
                             </td>
@@ -113,6 +139,9 @@ const SocialList = () => {
                     </nav>
                 </div>
             </div>
+            <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle}
+                                hideModal={hideConfirmationModal} type={type} id={id} index={key}
+                                message={deleteMessage}/>
         </>
     );
 };

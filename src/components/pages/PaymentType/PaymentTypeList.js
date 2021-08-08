@@ -4,15 +4,23 @@ import {useQuery} from "../../hooks/useQuery";
 import {get, remove} from '../../api/Api';
 import {Table} from "react-bootstrap";
 import Loader from "react-loader-spinner";
+import DeleteConfirmation from "../../others/ConfirmationModal";
 
 const PaymentList = (props) => {
     const history = useHistory();
     let query = useQuery();
     const currentPage = query.get("page") || 0;
     const [page, setPage] = useState(currentPage);
+    const [displayConfirmationModal, setDisplayConfirmationModal] = useState(false);
+    const [deleteMessage, setDeleteMessage] = useState(null);
+    const [type, setType] = useState('');
+    const [key, setKey] = useState('');
+    const [id, setId] = useState('');
+
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [rowNums, setRowNums] = useState(0);
     const [res, setResponse] = useState(0);
+
 
     const paginate = (n) => {
         setPage(n);
@@ -38,15 +46,28 @@ const PaymentList = (props) => {
         getResponseData();
     }, [page]);
 
-    const deleteHandle = (id) => {
-        setIsFetchingData(true)
-        remove(`/payment-types/${id}`).then((res) => {
+    const showDeleteModal = (key, type, id) => {
+        setType(type);
+        setId(id);
+        setKey(key);
+        setDeleteMessage(`Məlumatı silmək istədiyinizdən əminsiniz?`);
+        setDisplayConfirmationModal(true);
+    };
+
+    // Hide the modal
+    const hideConfirmationModal = () => {
+        setDisplayConfirmationModal(false);
+    };
+
+    const deleteHandle = (key, type, id) => {
+        remove(`${type}/${id}`).then(res => {
             getResponseData();
             setIsFetchingData(false)
-        }).catch((error) => {
-            setIsFetchingData(false)
-        })
-    };
+        }).catch(err => {
+            setIsFetchingData(false);
+        });
+        setDisplayConfirmationModal(false);
+    }
 
     if (isFetchingData) {
         return (
@@ -83,7 +104,8 @@ const PaymentList = (props) => {
                                 >
                                     <i className='fas fa-edit fa-sm text-success'/>
                                 </Link>
-                                <span className='ml-2 btn-xs delete-button' onClick={deleteHandle.bind(this, id)}>
+                                <span className='ml-2 btn-xs delete-button'
+                                      onClick={showDeleteModal.bind(this, 0, "payment-types", id)}>
                                 <i className="fas fa-trash-alt fa-sm text-danger"/>
                             </span>
                             </td>
@@ -116,6 +138,9 @@ const PaymentList = (props) => {
                     </nav>
                 </div>
             </div>
+            <DeleteConfirmation showModal={displayConfirmationModal} confirmModal={deleteHandle}
+                                hideModal={hideConfirmationModal} type={type} id={id} index={key}
+                                message={deleteMessage}/>
         </>
     );
 }

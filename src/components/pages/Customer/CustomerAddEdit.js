@@ -462,13 +462,13 @@ const CustomerAddEdit = () => {
                                                        required
                                                        onChange={handleChange.bind(this, i, "notes", "note")}/>
                                             </div>
-                                            <span className="ml-2 mr-2 text-danger delete-button"
+                                            <button className="ml-2 mr-2 btn btn-danger btn-xs"
                                                   onClick={deleteHandle.bind(this, i, "notes", noteInfo.id)}>
                                                     <i className="fas fa-trash-alt fa-sm"/>
-                                                </span>
-                                            <div className="cursor-pointer"
+                                            </button>
+                                            <div className="btn btn-success btn-xs"
                                                  onClick={onUpdateHandler.bind(this, noteInfo.id, i, "note")}>
-                                                <i className="fas fa-check-circle text-success"/>
+                                                <i className="fas fa-check-circle"/>
                                             </div>
                                         </div>
                                     </div>
