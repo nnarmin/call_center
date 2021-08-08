@@ -5,6 +5,9 @@ import {get, post, put, remove} from '../../api/Api';
 import {Button, Card, Tabs, Tab} from "react-bootstrap";
 import Loader from "react-loader-spinner";
 import {formattedDate} from "../../helpers/formattedDate";
+import Select from "react-select";
+import {selectStyles} from "../../helpers/selectStyles";
+import {NoOptionsMessage} from "../../helpers/NoOptionsMessage";
 
 const CustomerAddEdit = () => {
     let query = useQuery();
@@ -13,6 +16,9 @@ const CustomerAddEdit = () => {
     const userId = query.get('id');
     const type = query.get('type');
     const itemID = query.get('itemID');
+    const [isDisabled, setIsDisabled] = useState(true);
+    const [socialTypeList, setSocialTypeList] = useState([]);
+    const [selectedValue, setSelectedValue] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isFetchingData, setIsFetchingData] = useState(false);
     const [isDIsabled, setIsDIsabled] = useState(true);
@@ -236,6 +242,43 @@ const CustomerAddEdit = () => {
         }
     }
 
+    useEffect(() => {
+        get('/social-types').then((res) => {
+            setIsFetchingData(false);
+            setSocialTypeList(res?.content?.map((socialType) => ({
+                value: socialType.id,
+                label: `${socialType.name}`,
+            })));
+        }).catch((err) => {
+            setIsFetchingData(false);
+        })
+    }, []);
+
+    const handleSelectChange = (event) => {
+        setSelectedValue(event.value);
+        setIsDisabled(false)
+    }
+
+    const handlePurchaseForm = (event) => {
+        event.preventDefault();
+        setIsLoading(true);
+        const purchaseData = {
+            "customer": {
+                "id": userState.id
+            },
+            "socialType": {
+                "id": selectedValue
+            }
+        };
+        post('/purchases', purchaseData).then((res) => {
+            history.push(`/purchase/add?id=${userState.id}&purchase_id=${res.id}`);
+            setIsLoading(false);
+        }).catch((err) => {
+            setIsLoading(false);
+        })
+    }
+
+
     if (isFetchingData) {
         return (
             <div className="card">
@@ -458,6 +501,31 @@ const CustomerAddEdit = () => {
                         </div>
 
                     </Tab>
+                    {!isEditable && <Tab eventKey="newOrder" title="Yeni Sifariş" disabled={isDIsabled}>
+                        <div className="row">
+                            <div className="col-md-8 col-lg-6">
+                                <form onSubmit={handlePurchaseForm}>
+                                    <label>Yeni Sifariş</label>
+                                    <div className="d-flex">
+                                        <Select
+                                            styles={selectStyles}
+                                            options={socialTypeList}
+                                            components={(props) => NoOptionsMessage(props, 'Sosial Şəbəkə növü tapılmadı')}
+                                            onChange={handleSelectChange}
+                                            placeholder='Sosial Şəbəkə növünü seçin...'
+                                        />
+                                        <Button
+                                            type="submit"
+                                            variant="success"
+                                            disabled={isLoading || isDisabled}
+                                            className="ml-2"
+                                        >{isLoading ? 'Gözləyin…' : 'Əlavə et'}</Button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </Tab>
+                    }
                 </Tabs>
                 }
             </Card.Body>

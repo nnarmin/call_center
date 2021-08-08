@@ -10,7 +10,7 @@ import {formattedDate} from "../../helpers/formattedDate";
 
 const PurchaseItem = () => {
     const query = useQuery();
-    const purchase_id = query.get("purchase_id");
+    const purchase_id = query.get("purchaseID");
     const type = query.get("type");
     const item_id = query.get("id");
     const isEditable = query.get("edit");
