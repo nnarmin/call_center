@@ -6,9 +6,9 @@ import axios from "axios";
 let token = '';
 
 const Search = (props) => {
+    const [result, setResult] = useState([]);
     const [state, setState] = useState({
         query: '',
-        results: {},
         isloading: false,
         message: '',
         page: 0,
@@ -16,7 +16,7 @@ const Search = (props) => {
     })
 
     const paginate = (page) => {
-         setState(prevState => ({
+        setState(prevState => ({
             ...prevState,
             page,
         }));
@@ -24,6 +24,7 @@ const Search = (props) => {
     }
 
     const fetchSearchResults = (pageNumber, query) => {
+        console.log("query, pagenumber", query, pageNumber)
         if (token) {
             token.cancel();
         }
@@ -38,15 +39,16 @@ const Search = (props) => {
             cancelToken: token.token
         }).then((res) => {
             const messageInfo = res?.content?.length ? '' : 'Axtarışa uyğun nəticə tapılmadı.';
+            setResult(res);
             setState(prevState => ({
                 ...prevState,
                 isloading: false,
-                message: messageInfo,
-                results: res
+                message: messageInfo
             }));
         }).catch((error) => {
             if (axios.isCancel(error) || error) {
-                const messageInfo = error?.response?.data?.message
+                const messageInfo = error?.response?.data?.message;
+                setResult([]);
                 setState(prevState => ({
                     ...prevState,
                     isloading: false,
@@ -58,23 +60,40 @@ const Search = (props) => {
 
     const handleOnInputChange = (event) => {
         const query = event.target.value;
-        if (query) {
-            setState(prevState => ({
-                    ...prevState,
-                    query,
-                }
-            ));
+        setState(prevState => ({
+                ...prevState,
+                query,
+            }
+        ));
+
+        if(query){
             fetchSearchResults(state.page, query);
         } else {
+            setResult([]);
             setState({
                 query: '',
-                results: {},
+                isloading: false,
+                message: '',
+                page: 0
+            });
+            console.log("000");
+        }
+
+    };
+
+    const onSearchClick = () => {
+        if (state.query) {
+            fetchSearchResults(state.page, state.query);
+        } else {
+            setResult([]);
+            setState({
+                query: '',
                 isloading: false,
                 message: '',
                 page: 0
             });
         }
-    };
+    }
 
     return (
         <React.Fragment>
@@ -87,20 +106,22 @@ const Search = (props) => {
                     className="form-control"
                     autoComplete="off"
                     onChange={handleOnInputChange}
-                />
-                <i className="fa fa-search search-icon"/>
+                />{/*
+                <button type="button" onClick={onSearchClick} className="btn btn-success">
+                    <i className="fa fa-search btn-xs"/>
+                </button>*/}
             </div>
             <div className="search-result">
                 {props.type === "name" || props.type === "surname" ?
-                    state.results?.content && state.results?.content?.map((result) => (
+                    result?.content && result?.content?.map((result) => (
                         <Link to={`customerInfo/${result.id}`}
-                        className="list-group-item list-group-item-action"
-                        key={result.id}>{result.name} {result.surname}</Link>
-                        ))
+                              className="list-group-item list-group-item-action"
+                              key={result.id}>{result.name} {result.surname}</Link>
+                    ))
                     : null
                 }
                 {props.type === "contact" || props.type === "address" ?
-                    state.results?.content && state.results?.content?.map((result) => (
+                    result?.content && result?.content?.map((result) => (
                         <Link to={`customerInfo/${result.customer.id}`}
                               className="list-group-item list-group-item-action"
                               key={result.id}> {result[props.type]} - {result.customer.name} {result.customer.surname}
@@ -109,24 +130,24 @@ const Search = (props) => {
                     )) : null
                 }
                 {state.message}
-                {state.results?.content && state.results?.totalPages && <div className='row pt-2'>
+                {result?.content && result?.totalPages && <div className='row pt-2'>
                     <div className='col-md-6'>
                         <nav aria-label='Page navigation example p-0'>
                             <ul className='pagination mb-0'>
-                                <li className={`page-item ${state.results?.first ? 'disabled' : ''}`}>
+                                <li className={`page-item ${result?.first ? 'disabled' : ''}`}>
                                     <button onClick={paginate.bind(this, state.page - 1)} type='button'
                                             className='page-link'>
                                         Əvvəlki
                                     </button>
                                 </li>
-                                {[...Array(state.results?.totalPages).keys()].map((num) => (
+                                {[...Array(result?.totalPages).keys()].map((num) => (
                                     <li key={num}
-                                        className={`page-item ${state.results?.number === num ? 'active' : ''}`}>
+                                        className={`page-item ${result?.number === num ? 'active' : ''}`}>
                                         <button type='button' onClick={paginate.bind(this, num)}
                                                 className='page-link'>{+num + 1}</button>
                                     </li>
                                 ))}
-                                <li className={`page-item ${state.results?.last ? 'disabled' : ''}`}>
+                                <li className={`page-item ${result?.last ? 'disabled' : ''}`}>
                                     <button type='button' onClick={paginate.bind(this, state.page + 1)}
                                             className='page-link'>
                                         Növbəti
