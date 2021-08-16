@@ -9,6 +9,7 @@ export const get = (url) => axiosInstance.get(url).then((res) => res.data);
 export const post = (url, data) => axiosInstance.post(url, data).then((res) => res.data);
 export const put = (url, data) => axiosInstance.put(url, data).then((res) => res.data);
 export const remove = (url, data) => axiosInstance.delete(url, data).then((res) => res.data);
+export const gett = (url) => axiosInstance.get(url)
 
 axiosInstance.interceptors.request.use((config) => {
     const jwt = localStorage.getItem('jwt_token');

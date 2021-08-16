@@ -19,8 +19,7 @@ const PaymentList = (props) => {
 
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [rowNums, setRowNums] = useState(0);
-    const [res, setResponse] = useState(0);
-
+    const [res, setResponse] = useState([]);
 
     const paginate = (n) => {
         setPage(n);

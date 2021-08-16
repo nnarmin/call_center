@@ -24,7 +24,6 @@ const Search = (props) => {
     }
 
     const fetchSearchResults = (pageNumber, query) => {
-        console.log("query, pagenumber", query, pageNumber)
         if (token) {
             token.cancel();
         }
@@ -76,7 +75,6 @@ const Search = (props) => {
                 message: '',
                 page: 0
             });
-            console.log("000");
         }
 
     };

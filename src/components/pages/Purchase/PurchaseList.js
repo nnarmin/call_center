@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Link, useParams} from "react-router-dom";
-import {get, remove} from "../../api/Api";
+import {get, remove, gett} from "../../api/Api";
 import {formattedDate} from "../../helpers/formattedDate";
 import DeleteConfirmation from "../../others/ConfirmationModal";
 import {
@@ -8,6 +8,7 @@ import {
 } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import Loader from "react-loader-spinner";
+import axios from "axios";
 
 const PurchaseList = () => {
     const params = useParams();
@@ -30,9 +31,9 @@ const PurchaseList = () => {
     const [key, setKey] = useState('');
     const [id, setId] = useState('');
 
-    useEffect(() => {
-        setIsFetchingData(true)
-        get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=3`).then(res => {
+    useEffect(async () => {
+        setIsFetchingData(true);
+        await get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=3&sort=id,desc`).then(res => {
             setPaginationInfo(prevState => ({
                 ...prevState,
                 totalPages: res.totalPages,
@@ -40,67 +41,74 @@ const PurchaseList = () => {
                 first: res.first,
                 number: res.number
             }))
-            res.content.length && res.content.map(async purchase => {
-                console.log(purchase.id)
+            res.content.length && res.content.map(purchase => {
                 setIsFetchingItemData(true);
                 setIsFetchingNoteData(true);
                 setIsFetchingStatusData(true);
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
-                await get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resNote.push(...result.content);
-                    console.log("note", result.content)
-                    setIsFetchingItemData(false);
-                }).catch(err => {
-                    console.log(err)
-                });
 
-                await get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resItem.push(...result.content);
-                    console.log("item", result.content)
-                    setIsFetchingNoteData(false);
-                }).catch(err => {
-                    console.log(err)
-                })
+                Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
+                    .then(function (results) {
+                        resItem.push(...results[0].data.content);
+                        resNote.push(...results[1].data.content);
+                        resStatus.push(...results[2].data.content);
 
-                await get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resStatus.push(...result.content)
-                    console.log("status", result.content)
-                    setIsFetchingStatusData(false);
-                }).catch(err => {
-                    console.log(err)
-                });
+                        console.log(`resItem-${purchase.id}`, resItem)
+                        console.log(`resNote-${purchase.id}`, resNote)
+                        console.log(`resStatus-${purchase.id}`, resStatus);
 
-                console.log("state", {
-                    createdBy: purchase.createdBy,
-                    createdAt: purchase.createdAt,
-                    modifiedAt: purchase.modifiedAt,
-                    modifiedBy: purchase.modifiedBy,
-                    id: purchase.id,
-                    purchaseNote: resNote,
-                    purchaseItem: resItem,
-                    purchaseStatus: resStatus
-                })
+                        const newPurchase = {
+                                    createdBy: purchase.createdBy,
+                                    createdAt: purchase.createdAt,
+                                    modifiedAt: purchase.modifiedAt,
+                                    modifiedBy: purchase.modifiedBy,
+                                    id: purchase.id,
+                                    purchaseNote: resNote,
+                                    purchaseItem: resItem,
+                                    purchaseStatus: resStatus
+                                }
 
-                await setPurchaseState((prevState => [
-                    ...prevState,
-                    {
-                        createdBy: purchase.createdBy,
-                        createdAt: purchase.createdAt,
-                        modifiedAt: purchase.modifiedAt,
-                        modifiedBy: purchase.modifiedBy,
-                        id: purchase.id,
-                        purchaseNote: resNote,
-                        purchaseItem: resItem,
-                        purchaseStatus: resStatus
-                    }
-                ]));
+                        /*const joined = purchaseState.push(newPurchase);
+                        setPurchaseState(joined);*/
 
+                        setPurchaseState(prevState => ([
+                            ...prevState,
+                            {
+                                createdBy: purchase.createdBy,
+                                createdAt: purchase.createdAt,
+                                modifiedAt: purchase.modifiedAt,
+                                modifiedBy: purchase.modifiedBy,
+                                id: purchase.id,
+                                purchaseNote: resNote,
+                                purchaseItem: resItem,
+                                purchaseStatus: resStatus
+                            }
+                        ]))
+                    });
             })
-            setIsFetchingData(false);
-        }).catch(err => console.log(err))
+
+        }).catch(err => console.log(err)).finally(() => {
+            setIsFetchingItemData(false);
+            setIsFetchingStatusData(false);
+            setIsFetchingNoteData(false);
+            setIsFetchingData(false)
+        })
     }, []);
+
+    function getPurchaseItem(id) {
+        return gett(`http://159.89.43.254:8081/api/v1/purchase-items/search?purchaseId.equals=${id}&page=0&size=5`);
+    }
+
+    function getPurchaseStatus(id) {
+        return gett(`http://159.89.43.254:8081/api/v1/purchase-statuses/search?purchaseId.equals=${id}&page=0&size=5`);
+    }
+
+    function getPurchaseNote(id) {
+        return gett(`http://159.89.43.254:8081/api/v1/purchase-notes/search?purchaseId.equals=${id}&page=0&size=5`);
+    }
+
 
     const paginate = (page) => {
         setPaginationInfo(prevState => ({
@@ -110,10 +118,10 @@ const PurchaseList = () => {
         fetchData(page);
     }
 
-    const fetchData = (page) => {
+    const fetchData = async (page) => {
         setIsFetchingData(true);
         setPurchaseState([]);
-        get(`purchases/search?customerId.equals=${userID}&page=${page}&size=3`).then(res => {
+        await get(`purchases/search?customerId.equals=${userID}&page=${page}&size=3&sort=id,desc`).then(res => {
             setPaginationInfo(prevState => ({
                 ...prevState,
                 totalPages: res.totalPages,
@@ -122,41 +130,43 @@ const PurchaseList = () => {
                 number: res.number
             }))
             res.content.length && res.content.map(async purchase => {
+                setIsFetchingItemData(true);
+                setIsFetchingNoteData(true);
+                setIsFetchingStatusData(true);
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
-                await get(`purchase-notes/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resNote.push(...result.content);
-                }).catch(err => {
-                    console.log(err)
-                });
-                await get(`purchase-items/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resItem.push(...result.content);
-                }).catch(err => {
-                    console.log(err)
-                })
-                await get(`/purchase-statuses/search?purchaseId.equals=${purchase.id}&page=0&size=5`).then(result => {
-                    resStatus.push(...result.content)
-                }).catch(err => {
-                    console.log(err)
-                });
-
-                setPurchaseState((prevState => [
-                    ...prevState,
-                    {
-                        createdBy: purchase.createdBy,
-                        createdAt: purchase.createdAt,
-                        modifiedAt: purchase.modifiedAt,
-                        modifiedBy: purchase.modifiedBy,
-                        id: purchase.id,
-                        purchaseNote: resNote,
-                        purchaseItem: resItem,
-                        purchaseStatus: resStatus
-                    }
-                ]));
+                console.log(purchase.id);
+                await Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
+                    .then(function (results) {
+                        resItem.push(...results[0].data.content);
+                        resNote.push(...results[1].data.content);
+                        resStatus.push(...results[2].data.content);
+                        console.log(`resItem-${purchase.id}`, resItem)
+                        console.log(`resNote-${purchase.id}`, resNote)
+                        console.log(`resStatus-${purchase.id}`, resStatus);
+                        setPurchaseState(prevState => ([
+                            ...prevState,
+                            {
+                                createdBy: purchase.createdBy,
+                                createdAt: purchase.createdAt,
+                                modifiedAt: purchase.modifiedAt,
+                                modifiedBy: purchase.modifiedBy,
+                                id: purchase.id,
+                                purchaseNote: resNote,
+                                purchaseItem: resItem,
+                                purchaseStatus: resStatus
+                            }
+                        ]))
+                    });
             })
-            setIsFetchingData(false);
-        }).catch(err => console.log(err))
+
+        }).catch(err => console.log(err)).finally(() => {
+            setIsFetchingItemData(false);
+            setIsFetchingStatusData(false);
+            setIsFetchingNoteData(false);
+            setIsFetchingData(false)
+        })
     }
 
     const showDeleteModal = (key, type, id) => {
@@ -219,6 +229,7 @@ const PurchaseList = () => {
                                             </span>
                                         </div>
                                     </div>
+                                    {console.log(purchase)}
                                     <div className="flex-1">
                                         <Tabs>
                                             <TabList>
@@ -230,6 +241,7 @@ const PurchaseList = () => {
                                                 <div className="text-right"><Link
                                                     to={`/purchase/add?type=info&purchase_id=${purchase.id}`}
                                                     className="btn btn-success mb-2">Yeni Məhsul</Link></div>
+                                                Sifaris Id : {purchase.id}
                                                 {purchase.purchaseItem.length ? (
                                                         <div className="table-responsive">
                                                             <table className="table table-bordered table-hover mb-0">
