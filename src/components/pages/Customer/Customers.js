@@ -6,16 +6,15 @@ import Search from "../../others/search";
 const Customers = () => {
     return (
         <React.Fragment>
-            <Card>
-                <Card.Body className="text-center">
-                    <Link to="/customer/add">
-                        <Button variant="primary">Yeni Müştəri</Button>
-                    </Link>
-                </Card.Body>
-            </Card>
             <div className="row mt-3">
                 <div className="col-lg-12">
                     <Card>
+                        <Card.Header className="d-flex justify-content-between align-items-center">
+                            <h5 className="mb-0">Müştəri üzrə axtarış</h5>
+                            <Link to="/customer/add">
+                                <Button variant="primary">Yeni Müştəri</Button>
+                            </Link>
+                        </Card.Header>
                         <Card.Body>
                             <ul className="nav nav-tabs mb-3" id="ex1" role="tablist">
                                 <li className="nav-item" role="presentation">

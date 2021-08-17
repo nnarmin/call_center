@@ -2,8 +2,8 @@ import React, {useEffect, useState} from "react";
 import {useHistory, useParams} from "react-router-dom";
 import {get, post} from "../../api/Api";
 import Select from 'react-select';
-import {Button, Card} from "react-bootstrap";
 import {selectStyles} from '../../helpers/selectStyles';
+import {Button, Card} from "react-bootstrap";
 import {NoOptionsMessage} from '../../helpers/NoOptionsMessage';
 import Loader from "react-loader-spinner";
 

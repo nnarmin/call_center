@@ -8,7 +8,6 @@ import {
 } from 'react-tabs';
 import 'react-tabs/style/react-tabs.css';
 import Loader from "react-loader-spinner";
-import axios from "axios";
 
 const PurchaseList = () => {
     const params = useParams();
@@ -23,9 +22,6 @@ const PurchaseList = () => {
         page: 0
     });
     const [isFetchingData, setIsFetchingData] = useState(false);
-    const [isFetchingItemData, setIsFetchingItemData] = useState(false);
-    const [isFetchingNoteData, setIsFetchingNoteData] = useState(false);
-    const [isFetchingStatusData, setIsFetchingStatusData] = useState(false);
     const [purchaseState, setPurchaseState] = useState([]);
     const [type, setType] = useState('');
     const [key, setKey] = useState('');
@@ -42,9 +38,6 @@ const PurchaseList = () => {
                 number: res.number
             }))
             res.content.length && res.content.map(purchase => {
-                setIsFetchingItemData(true);
-                setIsFetchingNoteData(true);
-                setIsFetchingStatusData(true);
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
@@ -59,21 +52,8 @@ const PurchaseList = () => {
                         console.log(`resNote-${purchase.id}`, resNote)
                         console.log(`resStatus-${purchase.id}`, resStatus);
 
-                        const newPurchase = {
-                                    createdBy: purchase.createdBy,
-                                    createdAt: purchase.createdAt,
-                                    modifiedAt: purchase.modifiedAt,
-                                    modifiedBy: purchase.modifiedBy,
-                                    id: purchase.id,
-                                    purchaseNote: resNote,
-                                    purchaseItem: resItem,
-                                    purchaseStatus: resStatus
-                                }
-
-                        /*const joined = purchaseState.push(newPurchase);
-                        setPurchaseState(joined);*/
-
-                        setPurchaseState(prevState => ([
+                        setPurchaseState(prevState => (
+                            [
                             ...prevState,
                             {
                                 createdBy: purchase.createdBy,
@@ -85,28 +65,26 @@ const PurchaseList = () => {
                                 purchaseItem: resItem,
                                 purchaseStatus: resStatus
                             }
-                        ]))
+                        ]
+                        ))
                     });
             })
 
         }).catch(err => console.log(err)).finally(() => {
-            setIsFetchingItemData(false);
-            setIsFetchingStatusData(false);
-            setIsFetchingNoteData(false);
             setIsFetchingData(false)
         })
     }, []);
 
     function getPurchaseItem(id) {
-        return gett(`http://159.89.43.254:8081/api/v1/purchase-items/search?purchaseId.equals=${id}&page=0&size=5`);
+        return gett(`/purchase-items/search?purchaseId.equals=${id}&page=0&size=5`);
     }
 
     function getPurchaseStatus(id) {
-        return gett(`http://159.89.43.254:8081/api/v1/purchase-statuses/search?purchaseId.equals=${id}&page=0&size=5`);
+        return gett(`/purchase-statuses/search?purchaseId.equals=${id}&page=0&size=5`);
     }
 
     function getPurchaseNote(id) {
-        return gett(`http://159.89.43.254:8081/api/v1/purchase-notes/search?purchaseId.equals=${id}&page=0&size=5`);
+        return gett(`/purchase-notes/search?purchaseId.equals=${id}&page=0&size=5`);
     }
 
 
@@ -130,9 +108,6 @@ const PurchaseList = () => {
                 number: res.number
             }))
             res.content.length && res.content.map(async purchase => {
-                setIsFetchingItemData(true);
-                setIsFetchingNoteData(true);
-                setIsFetchingStatusData(true);
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
@@ -162,9 +137,6 @@ const PurchaseList = () => {
             })
 
         }).catch(err => console.log(err)).finally(() => {
-            setIsFetchingItemData(false);
-            setIsFetchingStatusData(false);
-            setIsFetchingNoteData(false);
             setIsFetchingData(false)
         })
     }
