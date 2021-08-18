@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import {Link, useHistory} from "react-router-dom";
 import {useQuery} from "../../hooks/useQuery";
 import {get, post, put, remove} from '../../api/Api';
@@ -94,7 +94,7 @@ const CustomerAddEdit = () => {
         }
     }, [isEditable, userId, isDIsabled, type, activeTab]);
 
-    const getData = (type) => {
+    const getData = useCallback( (type) => {
         setIsFetchingData(true);
         get(`/customer-${type}/${itemID}`).then((res) => {
             setUserState((prevState) => ({
@@ -106,7 +106,7 @@ const CustomerAddEdit = () => {
         }).catch(() => {
             setIsFetchingData(false);
         })
-    }
+    }, [type]);
 
     const addNewInput = (data, type) => {
         const alldata = [...userState[data], {

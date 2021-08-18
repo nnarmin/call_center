@@ -79,20 +79,6 @@ const Search = (props) => {
 
     };
 
-    const onSearchClick = () => {
-        if (state.query) {
-            fetchSearchResults(state.page, state.query);
-        } else {
-            setResult([]);
-            setState({
-                query: '',
-                isloading: false,
-                message: '',
-                page: 0
-            });
-        }
-    }
-
     return (
         <React.Fragment>
             <div className="form-group position-relative">
@@ -104,10 +90,7 @@ const Search = (props) => {
                     className="form-control"
                     autoComplete="off"
                     onChange={handleOnInputChange}
-                />{/*
-                <button type="button" onClick={onSearchClick} className="btn btn-success">
-                    <i className="fa fa-search btn-xs"/>
-                </button>*/}
+                />
             </div>
             <div className="search-result">
                 {props.type === "name" || props.type === "surname" ?

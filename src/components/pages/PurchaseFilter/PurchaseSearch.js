@@ -18,7 +18,7 @@ const PurchaseSearch = () => {
         qty_lessThan: '',
         price_greaterThan: '',
         price_lessThan: '',
-        type_equals: '',
+        statusId_equals: '',
     });
 
     useEffect(() => {
@@ -34,7 +34,7 @@ const PurchaseSearch = () => {
     }, [])
 
     const handleOnInputChange = (type, event) => {
-        if(type==='type_equals'){
+        if(type === 'statusId_equals'){
             setSearchParameter(prevState => ({
                 ...prevState,
                 [type]: event.value
@@ -45,11 +45,10 @@ const PurchaseSearch = () => {
                 [type]: event.target.value
             }))
         }
-
     }
 
     const handleSearch = (type, query) => {
-        if(type==='type.equals'){
+        if(type==='statusId.equals'){
             history.push({
                 pathname: '/purchase-statuses',
                 search: `?${type}=${query}&page=0&size=10`
@@ -170,10 +169,10 @@ const PurchaseSearch = () => {
                                             styles={selectStyles}
                                             options={statusType}
                                             components={(props) => NoOptionsMessage(props, 'Status növü tapılmadı')}
-                                            onChange={(event) => handleOnInputChange('type_equals', event)}
+                                            onChange={(event) => handleOnInputChange('statusId_equals', event)}
                                             placeholder='Status növünü seçin...'
                                         />
-                                        <button onClick={() => handleSearch('type.equals', searchParameter.type_equals)} type="button" className="btn btn-success">
+                                        <button onClick={() => handleSearch('statusId.equals', searchParameter.statusId_equals)} type="button" className="btn btn-success">
                                             <i className="fa fa-search"/>
                                         </button>
                                     </div>
