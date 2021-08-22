@@ -27,7 +27,7 @@ const PurchaseItemList = () => {
             .then((res) => {
                 setPaginateInfo(res);
                 setRowNums(page === 0 ? 1 : (page * 10) + 1);
-                res.content.map(purchase => {
+                res.content.forEach(purchase => {
                     get(`purchases/${purchase.purchase.id}`).then(response => {
                         setPurchaseList(prevState => ([
                             ...prevState,

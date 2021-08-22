@@ -107,12 +107,12 @@ const PurchaseList = () => {
                 first: res.first,
                 number: res.number
             }))
-            res.content.length && res.content.map(async purchase => {
+            res.content.length && res.content.forEach(purchase => {
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
                 console.log(purchase.id);
-                await Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
+                Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
                     .then(function (results) {
                         resItem.push(...results[0].data.content);
                         resNote.push(...results[1].data.content);
