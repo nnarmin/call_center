@@ -27,52 +27,8 @@ const PurchaseList = () => {
     const [key, setKey] = useState('');
     const [id, setId] = useState('');
 
-    useEffect(async () => {
-        setIsFetchingData(true);
-        await get(`purchases/search?customerId.equals=${userID}&page=${paginationInfo.page}&size=3&sort=id,desc`).then(res => {
-            setPaginationInfo(prevState => ({
-                ...prevState,
-                totalPages: res.totalPages,
-                last: res.last,
-                first: res.first,
-                number: res.number
-            }))
-            res.content.length && res.content.map(purchase => {
-                const resNote = [];
-                const resItem = [];
-                const resStatus = [];
-
-                Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
-                    .then(function (results) {
-                        resItem.push(...results[0].data.content);
-                        resNote.push(...results[1].data.content);
-                        resStatus.push(...results[2].data.content);
-
-                        console.log(`resItem-${purchase.id}`, resItem)
-                        console.log(`resNote-${purchase.id}`, resNote)
-                        console.log(`resStatus-${purchase.id}`, resStatus);
-
-                        setPurchaseState(prevState => (
-                            [
-                            ...prevState,
-                            {
-                                createdBy: purchase.createdBy,
-                                createdAt: purchase.createdAt,
-                                modifiedAt: purchase.modifiedAt,
-                                modifiedBy: purchase.modifiedBy,
-                                id: purchase.id,
-                                purchaseNote: resNote,
-                                purchaseItem: resItem,
-                                purchaseStatus: resStatus
-                            }
-                        ]
-                        ))
-                    });
-            })
-
-        }).catch(err => console.log(err)).finally(() => {
-            setIsFetchingData(false)
-        })
+    useEffect( () => {
+        fetchData(0);
     }, []);
 
     function getPurchaseItem(id) {
@@ -99,28 +55,36 @@ const PurchaseList = () => {
     const fetchData = async (page) => {
         setIsFetchingData(true);
         setPurchaseState([]);
+        const allData=[];
         await get(`purchases/search?customerId.equals=${userID}&page=${page}&size=3&sort=id,desc`).then(res => {
-            setPaginationInfo(prevState => ({
-                ...prevState,
-                totalPages: res.totalPages,
-                last: res.last,
-                first: res.first,
-                number: res.number
-            }))
-            res.content.length && res.content.forEach(purchase => {
+            res.content.length && res.content.forEach(async purchase => {
                 const resNote = [];
                 const resItem = [];
                 const resStatus = [];
-                console.log(purchase.id);
-                Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
+
+                await Promise.all([getPurchaseItem(purchase.id), getPurchaseNote(purchase.id), getPurchaseStatus(purchase.id)])
                     .then(function (results) {
                         resItem.push(...results[0].data.content);
                         resNote.push(...results[1].data.content);
                         resStatus.push(...results[2].data.content);
+
                         console.log(`resItem-${purchase.id}`, resItem)
                         console.log(`resNote-${purchase.id}`, resNote)
                         console.log(`resStatus-${purchase.id}`, resStatus);
-                        setPurchaseState(prevState => ([
+
+                        allData.push({
+                            createdBy: purchase.createdBy,
+                            createdAt: purchase.createdAt,
+                            modifiedAt: purchase.modifiedAt,
+                            modifiedBy: purchase.modifiedBy,
+                            id: purchase.id,
+                            purchaseNote: resNote,
+                            purchaseItem: resItem,
+                            purchaseStatus: resStatus
+                        })
+
+                        /*setPurchaseState(prevState => (
+                            [
                             ...prevState,
                             {
                                 createdBy: purchase.createdBy,
@@ -132,10 +96,23 @@ const PurchaseList = () => {
                                 purchaseItem: resItem,
                                 purchaseStatus: resStatus
                             }
-                        ]))
+                        ]
+                        ))*/
+                        allData.sort(
+                            (a, b) => parseInt(b.id) - parseInt(a.id)
+                        );
                     });
+                setPurchaseState(prevState => ([
+                    ...allData
+                ]))
             })
-
+            setPaginationInfo(prevState => ({
+                ...prevState,
+                totalPages: res.totalPages,
+                last: res.last,
+                first: res.first,
+                number: res.number
+            }))
         }).catch(err => console.log(err)).finally(() => {
             setIsFetchingData(false)
         })
