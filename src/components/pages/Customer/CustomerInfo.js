@@ -28,7 +28,7 @@ const CustomerInfo = () => {
 
     useEffect(() => {
         getUserInfo(userID);
-    }, []);
+    }, [userID]);
 
     const showDeleteModal = (key, type, id) => {
         setType(type);

@@ -106,7 +106,7 @@ const CustomerAddEdit = () => {
         }).catch(() => {
             setIsFetchingData(false);
         })
-    }, [type]);
+    }, [itemID]);
 
     const addNewInput = (data, type) => {
         const alldata = [...userState[data], {

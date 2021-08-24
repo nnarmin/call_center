@@ -2,13 +2,8 @@ import React from 'react';
 import PaymentList from "./PaymentTypeList";
 import {Link} from "react-router-dom";
 import {Button, Card} from "react-bootstrap";
-import {useQuery} from "../../hooks/useQuery";
 
 const PaymentType = () => {
-    let query = useQuery();
-
-    const page = query.get("page");
-    console.log("page");
 
     return (
         <div className="row">

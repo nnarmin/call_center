@@ -81,23 +81,7 @@ const PurchaseList = () => {
                             purchaseNote: resNote,
                             purchaseItem: resItem,
                             purchaseStatus: resStatus
-                        })
-
-                        /*setPurchaseState(prevState => (
-                            [
-                            ...prevState,
-                            {
-                                createdBy: purchase.createdBy,
-                                createdAt: purchase.createdAt,
-                                modifiedAt: purchase.modifiedAt,
-                                modifiedBy: purchase.modifiedBy,
-                                id: purchase.id,
-                                purchaseNote: resNote,
-                                purchaseItem: resItem,
-                                purchaseStatus: resStatus
-                            }
-                        ]
-                        ))*/
+                        });
                         allData.sort(
                             (a, b) => parseInt(b.id) - parseInt(a.id)
                         );
@@ -178,7 +162,6 @@ const PurchaseList = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    {console.log(purchase)}
                                     <div className="flex-1">
                                         <Tabs>
                                             <TabList>

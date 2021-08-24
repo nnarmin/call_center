@@ -10,7 +10,6 @@ const PurchaseStatusesItem = () => {
     const [paginateInfo, setPaginateInfo] = useState([]);
     const [page, setPage] = useState(0);
     const search_param = history.location.search;
-    const search_type = history.location.search.split('?').pop().split('&')[0];
 
     const [isFetchingData, setIsFetchingData] = useState(true);
     const [rowNums, setRowNums] = useState(0);
@@ -29,7 +28,6 @@ const PurchaseStatusesItem = () => {
                 setPaginateInfo(res);
                 setRowNums(page === 0 ? 1 : (page * 10) + 1);
                 res.content.map(purchase => {
-                    console.log(purchase)
                     get(`purchases/${purchase.purchase.id}`).then(response => {
                         setPurchaseList(prevState => ([
                             ...prevState,
